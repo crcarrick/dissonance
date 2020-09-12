@@ -9,7 +9,7 @@ export const channelResolvers = {
   },
   Channel: {
     id: (channel) => channel._id,
-    messages: (channel, __, { messageService }) =>
+    messages: (channel, _, { messageService }) =>
       messageService.findByChannel(channel._id),
   },
 };

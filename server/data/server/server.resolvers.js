@@ -9,7 +9,7 @@ export const serverResolvers = {
   },
   Server: {
     id: (server) => server._id,
-    channels: (server, __, { channelService }) =>
+    channels: (server, _, { channelService }) =>
       channelService.findByServer(server._id),
   },
 };
