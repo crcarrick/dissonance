@@ -1,20 +1,21 @@
-import { Server } from '../server/server.model';
-import { Channel } from './channel.model';
-
 export class ChannelService {
+  constructor(channel) {
+    this.channel = channel;
+  }
+
   create({ name, serverId }) {
-    return Channel.create({ name, server: serverId });
+    return this.channel.create({ name, server: serverId });
   }
 
   findById(id) {
-    return Channel.findById(id);
+    return this.channel.findById(id);
   }
 
   findAll() {
-    return Channel.find();
+    return this.channel.find();
   }
 
   findByServer(serverId) {
-    return Channel.find({ server: serverId });
+    return this.channel.find({ server: serverId });
   }
 }

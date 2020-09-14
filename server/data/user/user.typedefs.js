@@ -1,17 +1,41 @@
-import gql from 'graphql-tag';
+import { gql } from 'apollo-server';
 
-export const userTypeDefs = gql`
-  extend type Query {
-    user(id: ID!): User
-    users: [User]
+export const typeDefs = gql`
+  input LoginUserInput {
+    email: String!
+    password: String!
   }
 
-  extend type Mutation {
-    createUser(username: String!): User
+  input SignupUserInput {
+    email: EmailAddress!
+    username: String!
+    password: String!
   }
 
   type User {
     id: ID!
+    email: String!
     username: String!
+    password: String!
+  }
+
+  type AuthUser {
+    id: ID!
+    email: String!
+    username: String!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: AuthUser!
+  }
+
+  extend type Query {
+    me: AuthUser @authenticated
+  }
+
+  extend type Mutation {
+    loginUser(input: LoginUserInput!): AuthPayload!
+    signupUser(input: SignupUserInput!): AuthPayload!
   }
 `;

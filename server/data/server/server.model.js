@@ -1,11 +1,14 @@
 import mongoose, { Schema } from 'mongoose';
 
-const ServerSchema = new Schema({
-  name: 'string',
-  channels: [{ type: Schema.Types.ObjectId, ref: 'Channel' }],
-});
+const serverSchema = new Schema(
+  {
+    name: String,
+    channels: [{ type: Schema.Types.ObjectId, ref: 'Channel' }],
+  },
+  { timestamps: true }
+);
 
-ServerSchema.statics.createWithChannel = async function ({ name }) {
+serverSchema.statics.createWithChannel = async function ({ name }) {
   const Channel = mongoose.model('Channel');
 
   const server = await Server.create({ name });
@@ -18,4 +21,4 @@ ServerSchema.statics.createWithChannel = async function ({ name }) {
   );
 };
 
-export const Server = mongoose.model('Server', ServerSchema);
+export const Server = mongoose.model('Server', serverSchema);

@@ -1,13 +1,37 @@
-export const userResolvers = {
+import { AuthenticationError } from 'apollo-server';
+import { idResolver } from './../util';
+
+export const resolvers = {
   Query: {
-    user: (_, { id }, { userService }) => userService.findById(id),
-    users: (_, __, { userService }) => userService.findAll(),
+    me: (_, __, { user }) => user,
   },
   Mutation: {
-    createUser: (_, { username }, { userService }) =>
-      userService.create({ username }),
+    loginUser: async (_, { input: { email, password } }, { userService }) => {
+      const user = await userService.findByEmail(email);
+
+      if (!user) {
+        throw new AuthenticationError('Bad email or password');
+      }
+
+      const match = user.validatePassword(password);
+
+      if (!match) {
+        throw new AuthenticationError('Bad email or password');
+      }
+
+      return { token: user.generateJWT(), user };
+    },
+    signupUser: async (
+      _,
+      { input: { email, password, username } },
+      { userService }
+    ) => {
+      const user = await userService.create({ email, password, username });
+
+      return { token: user.generateJWT(), user };
+    },
   },
   User: {
-    id: (user) => user._id,
+    ...idResolver,
   },
 };

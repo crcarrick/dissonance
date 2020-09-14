@@ -1,18 +1,23 @@
-import gql from 'graphql-tag';
+import { gql } from 'apollo-server';
 
-export const serverTypeDefs = gql`
+export const typeDefs = gql`
   extend type Query {
     server(id: ID!): Server
     servers: [Server]
   }
 
+  input CreateServerInput {
+    name: String!
+  }
+
   extend type Mutation {
-    createServer(name: String!): Server
+    createServer(input: CreateServerInput!): Server @authenticated
   }
 
   type Server {
     id: ID!
     name: String!
-    channels: [Channel]
+    channels: [Channel]!
+    owner: User!
   }
 `;

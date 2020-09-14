@@ -1,15 +1,17 @@
-import { Message } from './message.model';
-
 export class MessageService {
+  constructor(message) {
+    this.message = message;
+  }
+
   create({ channelId, text, userId }) {
-    return Message.create({ author: userId, channel: channelId, text });
+    return this.message.create({ author: userId, channel: channelId, text });
   }
 
   findById(id) {
-    return Message.findById(id);
+    return this.message.findById(id);
   }
 
   findByChannel(channelId) {
-    return Message.find({ channel: channelId });
+    return this.message.find({ channel: channelId });
   }
 }

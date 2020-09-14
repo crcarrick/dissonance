@@ -1,9 +1,12 @@
 import mongoose, { Schema } from 'mongoose';
 
-const MessageSchema = new Schema({
-  author: { type: Schema.Types.ObjectId, ref: 'User' },
-  channel: { type: Schema.Types.ObjectId, ref: 'Channel' },
-  text: 'string',
-});
+const messageSchema = new Schema(
+  {
+    author: { type: Schema.Types.ObjectId, ref: 'User' },
+    channel: { type: Schema.Types.ObjectId, ref: 'Channel' },
+    text: String,
+  },
+  { timestamps: true }
+);
 
-export const Message = mongoose.model('Message', MessageSchema);
+export const Message = mongoose.model('Message', messageSchema);

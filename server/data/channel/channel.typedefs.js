@@ -1,13 +1,18 @@
-import gql from 'graphql-tag';
+import { gql } from 'apollo-server';
 
-export const channelTypeDefs = gql`
+export const typeDefs = gql`
   extend type Query {
     channel(id: ID!): Channel
     channels: [Channel]
   }
 
+  input CreateChannelInput {
+    name: String!
+    serverId: ID!
+  }
+
   extend type Mutation {
-    createChannel(name: String!, serverId: ID!): Channel
+    createChannel(input: CreateChannelInput!): Channel
   }
 
   type Channel {

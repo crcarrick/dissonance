@@ -1,15 +1,17 @@
-import { User } from './user.model';
-
 export class UserService {
-  create({ username }) {
-    return User.create({ username });
+  constructor(user) {
+    this.user = user;
+  }
+
+  create({ email, password, username }) {
+    return this.user.create({ email, password, username });
+  }
+
+  findByEmail(email) {
+    return this.user.findOne({ email });
   }
 
   findById(id) {
-    return User.findById(id);
-  }
-
-  findAll() {
-    return User.find();
+    return this.user.findById(id);
   }
 }
