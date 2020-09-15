@@ -1,4 +1,4 @@
-import { gql, PubSub } from 'apollo-server';
+import { AuthenticationError, gql, PubSub } from 'apollo-server';
 import {
   typeDefs as graphqlScalarTypeDefs,
   resolvers as graphqlScalarResolvers,
@@ -9,15 +9,18 @@ import * as message from './message';
 import * as server from './server';
 import * as user from './user';
 
-import { AuthenticationDirective } from './directives';
+import { AuthenticationDirective, schemaDirectives } from './directives';
 
-import { createConfig, decodeToken } from './util';
+import { createConfig, findAuthUser } from './util';
+
+const pubsub = new PubSub();
 
 const baseTypeDefs = gql`
-  directive @authenticated on FIELD_DEFINITION
+  ${schemaDirectives}
 
   type Query
   type Mutation
+  type Subscription
 `;
 
 export * from './database';
@@ -34,36 +37,41 @@ export const gqlConfig = createConfig({
     user.typeDefs,
   ],
   resolvers: [
-    { ...graphqlScalarResolvers },
+    graphqlScalarResolvers,
 
     channel.resolvers,
     message.resolvers,
     server.resolvers,
     user.resolvers,
   ],
-  context: async (request) => {
-    const pubsub = new PubSub();
+  subscriptions: {
+    onConnect: async (connectionParams) => {
+      if (connectionParams.Authorization) {
+        const authUser = await findAuthUser(connectionParams.Authorization);
 
-    const channelService = new channel.ChannelService(channel.Channel);
-    const messageService = new message.MessageService(message.Message);
-    const serverService = new server.ServerService(server.Server);
-    const userService = new user.UserService(user.User);
+        return { user: authUser };
+      }
 
-    const decodedToken = decodeToken(request.req.headers.authorization);
-
-    const authUser = decodedToken?.id
-      ? await userService.findById(decodedToken.id)
-      : null;
+      throw new AuthenticationError('Not authenticated');
+    },
+  },
+  context: async ({ req, connection }) => {
+    let authUser;
+    if (connection) {
+      authUser = connection.context.user;
+    } else {
+      authUser = await findAuthUser(req.headers.authorization);
+    }
 
     return {
       pubsub,
 
       user: authUser,
 
-      channelService,
-      messageService,
-      serverService,
-      userService,
+      Channel: channel.Channel,
+      Message: message.Message,
+      Server: server.Server,
+      User: user.User,
     };
   },
   schemaDirectives: {

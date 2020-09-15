@@ -1,9 +1,16 @@
 import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
-  extend type Query {
-    channel(id: ID!): Channel
-    channels: [Channel]
+  # Channel Types
+  type Channel {
+    id: ID!
+    messages: [Message]
+    name: String!
+  }
+
+  # Channel Inputs
+  input FindChannelInput {
+    id: ID!
   }
 
   input CreateChannelInput {
@@ -11,13 +18,14 @@ export const typeDefs = gql`
     serverId: ID!
   }
 
-  extend type Mutation {
-    createChannel(input: CreateChannelInput!): Channel
+  # Channel Queries
+  extend type Query {
+    channel(input: FindChannelInput!): Channel
+    channels: [Channel]
   }
 
-  type Channel {
-    id: ID!
-    messages: [Message]
-    name: String!
+  # Channel Mutations
+  extend type Mutation {
+    createChannel(input: CreateChannelInput!): Channel
   }
 `;

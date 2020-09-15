@@ -1,6 +1,28 @@
 import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
+  # User Types
+  type User {
+    id: ID!
+    email: String!
+    username: String!
+    password: String!
+    servers: [Server]
+  }
+
+  type AuthUser {
+    id: ID!
+    email: String!
+    username: String!
+    servers: [Server]
+  }
+
+  type AuthPayload {
+    token: String!
+    user: AuthUser!
+  }
+
+  # User Inputs
   input LoginUserInput {
     email: String!
     password: String!
@@ -12,30 +34,19 @@ export const typeDefs = gql`
     password: String!
   }
 
-  type User {
-    id: ID!
-    email: String!
-    username: String!
-    password: String!
+  input JoinServerInput {
+    serverId: ID!
   }
 
-  type AuthUser {
-    id: ID!
-    email: String!
-    username: String!
-  }
-
-  type AuthPayload {
-    token: String!
-    user: AuthUser!
-  }
-
+  # User Queries
   extend type Query {
     me: AuthUser @authenticated
   }
 
+  # User Mutations
   extend type Mutation {
     loginUser(input: LoginUserInput!): AuthPayload!
     signupUser(input: SignupUserInput!): AuthPayload!
+    joinServer(input: JoinServerInput!): AuthUser! @authenticated
   }
 `;

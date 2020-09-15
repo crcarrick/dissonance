@@ -1,25 +1,52 @@
 import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
-  extend type Query {
-    messages(channelId: ID!): [Message] @authenticated
+  # Message Types
+  type Message {
+    id: ID!
+    text: String!
+    author: User!
+    channel: Channel!
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
+  }
+
+  type NewMessage {
+    id: ID!
+    text: String!
+    author: User!
+    channelId: String!
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
+  }
+
+  # Message Inputs
+  input FindMessagesInput {
+    channelId: ID!
   }
 
   input CreateMessageInput {
+    serverId: ID!
     channelId: ID!
     text: String!
   }
 
+  input MessageAddedInput {
+    channelId: ID!
+  }
+
+  # Message Queries
+  extend type Query {
+    messages(input: FindMessagesInput!): [Message] @authenticated
+  }
+
+  # Message Mutations
   extend type Mutation {
     createMessage(input: CreateMessageInput!): Message @authenticated
   }
 
-  type Message {
-    id: ID!
-    author: User!
-    channel: Channel!
-    text: String!
-    createdAt: Timestamp!
-    updatedAt: Timestamp!
+  # Message Subscriptions
+  extend type Subscription {
+    messageAdded(input: MessageAddedInput!): NewMessage
   }
 `;

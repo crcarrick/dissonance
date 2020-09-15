@@ -2,17 +2,16 @@ import { idResolver } from './../util';
 
 export const resolvers = {
   Query: {
-    channel: (_, { input: { id } }, { channelService }) =>
-      channelService.findById(id),
-    channels: (_, __, { channelService }) => channelService.findAll(),
+    channel: (_, { input: { id } }, { Channel }) => Channel.findById(id),
+    channels: (_, __, { Channel }) => Channel.find({}),
   },
   Mutation: {
-    createChannel: (_, { input: { name, serverId } }, { channelService }) =>
-      channelService.create({ name, serverId }),
+    createChannel: (_, { input: { name, serverId } }, { Channel }) =>
+      Channel.create({ name, server: serverId }),
   },
   Channel: {
     ...idResolver,
-    messages: (channel, _, { messageService }) =>
-      messageService.findByChannel(channel._id),
+    messages: (channel, _, { Message }) =>
+      Message.find({ channel: channel.id }),
   },
 };

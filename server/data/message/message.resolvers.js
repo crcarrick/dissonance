@@ -1,22 +1,61 @@
+import { AuthenticationError, withFilter } from 'apollo-server';
+
 import { idResolver } from './../util';
+
+const MESSAGE_ADDED = 'MESSAGE_ADDED';
+
+const createMessage = async (
+  _,
+  { input: { channelId, serverId, text } },
+  { pubsub, user, Message }
+) => {
+  if (user.servers.includes(serverId)) {
+    throw new AuthenticationError('Not authorized');
+  }
+
+  const message = await Message.create({
+    author: user.id,
+    channel: channelId,
+    text,
+  });
+
+  pubsub.publish(MESSAGE_ADDED, {
+    messageAdded: {
+      id: message.id,
+      text,
+      author: user,
+      channel: message.channel,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    },
+  });
+
+  return message;
+};
+
+const messageAdded = {
+  subscribe: withFilter(
+    (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED),
+    ({ messageAdded: { channel } }, { input: { channelId } }) =>
+      channel.equals(channelId)
+  ),
+};
 
 export const resolvers = {
   Query: {
-    messages: (_, { channelId }, { messageService }) =>
-      messageService.findByChannel(channelId),
+    messages: (_, { input: { channelId } }, { Message }) =>
+      Message.find({ channel: channelId }),
   },
   Mutation: {
-    createMessage: (
-      _,
-      { input: { channelId, text } },
-      { messageService, user }
-    ) => messageService.create({ channelId, text, userId: user.id }),
+    createMessage,
+  },
+  Subscription: {
+    messageAdded,
   },
   Message: {
     ...idResolver,
-    author: (message, _, { userService }) =>
-      userService.findById(message.author),
-    channel: (message, _, { channelService }) =>
-      channelService.findById(message.channel),
+
+    author: (message, _, { User }) => User.findById(message.author),
+    channel: (message, _, { Channel }) => Channel.findById(message.channel),
   },
 };

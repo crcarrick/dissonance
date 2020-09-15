@@ -1,23 +1,40 @@
 import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
-  extend type Query {
-    server(id: ID!): Server
-    servers: [Server]
+  # Server Types
+  type Server {
+    id: ID!
+    name: String!
+    channels: [Channel]!
+    owner: User!
+  }
+
+  type DeleteServerPayload {
+    id: ID!
+  }
+
+  # Server Inputs
+  input FindServerInput {
+    id: ID!
   }
 
   input CreateServerInput {
     name: String!
   }
 
-  extend type Mutation {
-    createServer(input: CreateServerInput!): Server @authenticated
+  input DeleteServerInput {
+    id: ID!
   }
 
-  type Server {
-    id: ID!
-    name: String!
-    channels: [Channel]!
-    owner: User!
+  # Server Queries
+  extend type Query {
+    server(input: FindServerInput!): Server
+    servers: [Server]
+  }
+
+  # Server Mutations
+  extend type Mutation {
+    createServer(input: CreateServerInput!): Server @authenticated
+    deleteServer(input: DeleteServerInput!): DeleteServerPayload @authenticated
   }
 `;

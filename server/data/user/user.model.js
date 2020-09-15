@@ -25,6 +25,7 @@ const userSchema = new Schema(
       type: String,
       required: [true, 'is required'],
     },
+    servers: [{ type: Schema.Types.ObjectId, ref: 'Server' }],
   },
   { timestamps: true }
 );
