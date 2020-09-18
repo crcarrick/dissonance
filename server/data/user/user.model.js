@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import { addDays, getUnixTime } from 'date-fns';
 import jwt from 'jsonwebtoken';
 import mongoose, { Schema } from 'mongoose';
+import uniqueValidator from 'mongoose-unique-validator';
 
 const userSchema = new Schema(
   {
@@ -19,6 +20,7 @@ const userSchema = new Schema(
         /^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/,
         'is invalid',
       ],
+      unique: true,
       index: true,
     },
     password: {
@@ -29,6 +31,8 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
+
+userSchema.plugin(uniqueValidator);
 
 userSchema.methods.generateJWT = function generateJWT() {
   const today = new Date();
