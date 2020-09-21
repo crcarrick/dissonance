@@ -26,7 +26,10 @@ module.exports = {
 
   webpack: {
     alias: {
+      '@dissonance/assets': path.resolve(__dirname, 'src/assets/'),
+      '@dissonance/client': path.resolve(__dirname, 'src/client.js'),
       '@dissonance/components': path.resolve(__dirname, 'src/components/'),
+      '@dissonance/data': path.resolve(__dirname, 'src/data/'),
       '@dissonance/hooks': path.resolve(__dirname, 'src/hooks/'),
     },
   },

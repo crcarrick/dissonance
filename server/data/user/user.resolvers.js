@@ -1,7 +1,4 @@
 import { ApolloError, AuthenticationError } from 'apollo-server';
-import { upperFirst } from 'lodash';
-
-import { idResolver } from './../util';
 
 const loginUser = async (_, { input: { email, password } }, { User }) => {
   const user = await User.findOne({ email });
@@ -52,11 +49,8 @@ export const resolvers = {
     joinServer: (_, { input: { serverId } }, { user, User }) =>
       User.findByIdAndUpdate(user.id, { $push: { servers: serverId } }),
   },
-  User: {
-    ...idResolver,
-
-    servers: (user, _, { Server }) => {
-      return Server.find({ id: { $in: user.servers } });
-    },
+  AuthUser: {
+    servers: (user, _, { Server }) =>
+      Server.find({ _id: { $in: user.servers } }),
   },
 };

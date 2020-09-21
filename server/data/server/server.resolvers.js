@@ -1,38 +1,8 @@
-import { idResolver } from './../util';
+const createServer = async (_, { input: { name } }, { user, Server }) =>
+  Server.create({ name, owner: user.id });
 
-const createServer = async (
-  _,
-  { input: { name } },
-  { user, Channel, Server, User }
-) => {
-  const server = await Server.create({ name, owner: user.id });
-  const channel = await Channel.create({ name: 'general', server: server.id });
-
-  await User.findByIdAndUpdate(user.id, { $push: { servers: server.id } });
-
-  server.channels = [channel];
-
-  return server.save();
-};
-
-const deleteServer = async (
-  _,
-  { input: { id } },
-  { user, Channel, Message, Server, User }
-) => {
-  const server = await Server.findById(id);
-
-  if (server.owner.equals(user.id)) {
-    await Promise.all([
-      server.delete(),
-      Channel.deleteMany({ server: server.id }),
-      Message.deleteMany({ channel: { $in: server.channels } }),
-      User.findByIdAndUpdate(user.id, { $pull: { servers: server.id } }),
-    ]);
-
-    return server;
-  }
-};
+const deleteServer = async (_, { input: { id } }, { user, Server }) =>
+  Server.findOneAndDelete({ _id: id, owner: user.id });
 
 export const resolvers = {
   Query: {
@@ -44,8 +14,6 @@ export const resolvers = {
     deleteServer,
   },
   Server: {
-    ...idResolver,
-
     channels: (server, _, { Channel }) => Channel.find({ server: server.id }),
   },
 };

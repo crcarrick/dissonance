@@ -8,7 +8,7 @@ import {
 import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
-  uri: process.env.GRAPHQL_API,
+  uri: process.env.REACT_APP_GRAPHQL_API,
   fetchOptions: {},
 });
 

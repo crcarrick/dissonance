@@ -24,7 +24,7 @@ export const useAuth = ({ initialValues, mutation }) => {
 
       localStorage.setItem(process.env.REACT_APP_AUTH_TOKEN, token);
 
-      history.push('/servers');
+      history.push('/channels/@me');
     }
   }, [data]);
 

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
-import { LoaderContainer, LoaderMessage } from './Loader.style';
+import { LoaderContainer, LoaderMessage, LoaderType } from './Loader.style';
 
 const MESSAGES = [
   '[A MEME]',
@@ -36,6 +36,7 @@ const MESSAGES = [
   'Wubba Lubba Dub Dub',
   'Scaling Bananas',
   'l o a d i n g a e s t h e t i c s',
+  'TREATS',
 ];
 
 const getRandomMessage = () => {
@@ -47,7 +48,9 @@ const getRandomMessage = () => {
   return MESSAGES[index];
 };
 
-export const Loader = ({ message = true, width = 100 }) => {
+export const Loader = ({ message = true, type = 'Loading', width = 100 }) => {
+  const msg = useRef(getRandomMessage());
+
   return (
     <LoaderContainer>
       <img
@@ -55,7 +58,12 @@ export const Loader = ({ message = true, width = 100 }) => {
         src="https://cdn.discordapp.com/attachments/414258067870449665/445736475158380544/discord.gif"
         style={{ width }}
       />
-      {message && <LoaderMessage>{getRandomMessage()}</LoaderMessage>}
+      {message && (
+        <>
+          <LoaderMessage>{msg.current}</LoaderMessage>
+          <LoaderType>{type}</LoaderType>
+        </>
+      )}
     </LoaderContainer>
   );
 };

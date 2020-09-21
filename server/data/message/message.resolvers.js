@@ -1,7 +1,5 @@
 import { AuthenticationError, withFilter } from 'apollo-server';
 
-import { idResolver } from './../util';
-
 const MESSAGE_ADDED = 'MESSAGE_ADDED';
 
 const createMessage = async (
@@ -53,8 +51,6 @@ export const resolvers = {
     messageAdded,
   },
   Message: {
-    ...idResolver,
-
     author: (message, _, { User }) => User.findById(message.author),
     channel: (message, _, { Channel }) => Channel.findById(message.channel),
   },

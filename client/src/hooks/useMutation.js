@@ -7,8 +7,8 @@ export const useMutation = (mutation, options) => {
     ...options,
   });
 
-  const wrappedMutation = (args, _options) =>
-    apolloMutation(args, { onError: noop, ..._options });
+  const wrappedMutation = (args, mutationOptions) =>
+    apolloMutation(args, { onError: noop, ...mutationOptions });
 
   return [wrappedMutation, ...rest];
 };

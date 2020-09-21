@@ -5,11 +5,10 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { Loader, ProtectedRoute } from '@dissonance/components';
+import { GET_ME } from '@dissonance/data';
 
 import { Auth } from './features/auth';
-import { Servers } from './features/servers';
-
-import { GET_ME } from './data';
+import { Home } from './features/home';
 
 export const App = () => {
   const { data: { me: user } = {}, loading } = useQuery(GET_ME);
@@ -20,7 +19,7 @@ export const App = () => {
     <>
       <CssBaseline />
       {loading ? (
-        <Loader />
+        <Loader type="Connecting" />
       ) : (
         <Switch>
           <Route path="/auth/:type(login|signup)">
@@ -28,12 +27,12 @@ export const App = () => {
           </Route>
           <ProtectedRoute
             canActivate={canActivate}
-            path="/servers"
+            path="/"
             redirectPath="/auth/login"
           >
-            <Servers />
+            <Home />
           </ProtectedRoute>
-          <Route path="*" render={() => <Redirect to="/auth/login" />} />
+          <Route path="*" render={() => <Redirect to="/" />} />
         </Switch>
       )}
     </>

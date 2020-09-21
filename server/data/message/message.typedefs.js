@@ -21,7 +21,7 @@ export const typeDefs = gql`
   }
 
   # Message Inputs
-  input FindMessagesInput {
+  input GetMessagesInput {
     channelId: ID!
   }
 
@@ -37,7 +37,7 @@ export const typeDefs = gql`
 
   # Message Queries
   extend type Query {
-    messages(input: FindMessagesInput!): [Message] @authenticated
+    messages(input: GetMessagesInput!): [Message] @authenticated
   }
 
   # Message Mutations

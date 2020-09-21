@@ -6,10 +6,11 @@ export const typeDefs = gql`
     id: ID!
     messages: [Message]
     name: String!
+    server: ID!
   }
 
   # Channel Inputs
-  input FindChannelInput {
+  input GetChannelInput {
     id: ID!
   }
 
@@ -20,7 +21,7 @@ export const typeDefs = gql`
 
   # Channel Queries
   extend type Query {
-    channel(input: FindChannelInput!): Channel
+    channel(input: GetChannelInput!): Channel
     channels: [Channel]
   }
 

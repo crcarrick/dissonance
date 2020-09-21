@@ -12,7 +12,14 @@ export const LoaderContainer = styled.div`
 `;
 
 export const LoaderMessage = styled.div`
-  font-size: 8px;
   font-family: 'Press Start 2P', mono;
+  font-size: 13px;
+  font-style: italic;
   margin-top: 20px;
+`;
+
+export const LoaderType = styled.div`
+  font-size: 14px;
+  color: #72767d;
+  font-weight: bold;
 `;

@@ -14,7 +14,7 @@ export const typeDefs = gql`
   }
 
   # Server Inputs
-  input FindServerInput {
+  input GetServerInput {
     id: ID!
   }
 
@@ -28,7 +28,7 @@ export const typeDefs = gql`
 
   # Server Queries
   extend type Query {
-    server(input: FindServerInput!): Server
+    server(input: GetServerInput!): Server
     servers: [Server]
   }
 

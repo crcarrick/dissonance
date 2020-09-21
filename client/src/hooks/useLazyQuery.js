@@ -7,8 +7,8 @@ export const useLazyQuery = (query, options) => {
     ...options,
   });
 
-  const wrappedLazyQuery = (args, _options) =>
-    apolloLazyQuery(args, { onError: noop, ..._options });
+  const wrappedLazyQuery = (args, queryOptions) =>
+    apolloLazyQuery(args, { onError: noop, ...queryOptions });
 
   return [wrappedLazyQuery, ...rest];
 };
