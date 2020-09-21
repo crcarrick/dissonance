@@ -1,12 +1,12 @@
-import mongoose, { Schema } from 'mongoose';
+export const message = ({ sequelize, Sequelize }) => {
+  const Message = sequelize.define('message', {
+    text: Sequelize.STRING,
+  });
 
-const messageSchema = new Schema(
-  {
-    author: { type: Schema.Types.ObjectId, ref: 'User' },
-    channel: { type: Schema.Types.ObjectId, ref: 'Channel' },
-    text: String,
-  },
-  { timestamps: true }
-);
+  Message.associate = (models) => {
+    Message.belongsTo(models.Channel);
+    Message.belongsTo(models.User, { as: 'author' });
+  };
 
-export const Message = mongoose.model('Message', messageSchema);
+  return Message;
+};
