@@ -1,19 +1,33 @@
-const createServer = async (_, { input: { name } }, { user, Server }) =>
-  Server.create({ name, owner: user.id });
+const createServer = async (
+  _,
+  { input: { name } },
+  { user, Channel, Server }
+) => {
+  const server = await Server.create(
+    {
+      name,
+      ownerId: user.id,
+      channels: [{ name: 'welcome' }, { name: 'general' }],
+    },
+    { include: { model: [Channel] } }
+  );
+
+  return server;
+};
 
 const deleteServer = async (_, { input: { id } }, { user, Server }) =>
-  Server.findOneAndDelete({ _id: id, owner: user.id });
+  Server.destroy({ where: { id, ownerId: user.id } });
 
 export const resolvers = {
   Query: {
-    server: (_, { input: { id } }, { Server }) => Server.findById(id),
-    servers: (_, __, { Server }) => Server.find({}),
+    server: (_, { input: { id } }, { Server }) => Server.findByPk(id),
+    servers: (_, __, { Server }) => Server.findAll(),
   },
   Mutation: {
     createServer,
     deleteServer,
   },
   Server: {
-    channels: (server, _, { Channel }) => Channel.find({ server: server.id }),
+    channels: (server) => server.getChannels(),
   },
 };

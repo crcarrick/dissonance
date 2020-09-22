@@ -1,12 +1,23 @@
-export const channel = ({ sequelize, Sequelize }) => {
-  const Channel = sequelize.define('channel', {
-    name: Sequelize.STRING,
-  });
+import { DataTypes, Model } from 'sequelize';
 
-  Channel.associate = (models) => {
-    Channel.belongsTo(models.Server);
-    Channel.hasMany(models.Message);
-  };
+export const channel = ({ sequelize }) => {
+  class Channel extends Model {
+    static associate(models) {
+      Channel.hasMany(models.Message, { foreignKey: 'channelId' });
+
+      Channel.belongsTo(models.Server, { foreignKey: 'serverId' });
+    }
+  }
+
+  Channel.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    { sequelize, tableName: 'channels' }
+  );
 
   return Channel;
 };

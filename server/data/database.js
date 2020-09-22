@@ -1,9 +1,9 @@
-import { Sequelize } from 'sequelize';
+import { Model, Sequelize } from 'sequelize';
 
-import { channel } from './channel';
-import { message } from './message';
-import { server } from './server';
-import { user } from './user';
+import { channel } from './channel/channel.model';
+import { message } from './message/message.model';
+import { server } from './server/server.model';
+import { user } from './user/user.model';
 
 export const connectDatabase = () => {
   const sequelize = new Sequelize(
@@ -13,18 +13,26 @@ export const connectDatabase = () => {
     {
       host: 'localhost',
       dialect: 'postgres',
+      logging: false,
     }
   );
 
-  const db = {
-    sequelize,
-    Sequelize,
-  };
+  const Channel = channel({ sequelize });
+  const Message = message({ sequelize });
+  const Server = server({ sequelize });
+  const User = user({ sequelize });
 
-  const Channel = channel(db);
-  const Message = message(db);
-  const Server = server(db);
-  const User = user(db);
+  class UserServer extends Model {}
 
-  return seq;
+  UserServer.init({}, { sequelize, tableName: 'users_servers' });
+
+  const models = { Channel, Message, Server, User, UserServer };
+
+  Object.keys(models).forEach((key) => {
+    if ('associate' in models[key]) {
+      models[key].associate(models);
+    }
+  });
+
+  return { models, sequelize };
 };

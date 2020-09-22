@@ -18,18 +18,12 @@ export const decodeToken = (authorization) => {
   }
 };
 
-export const findAuthUser = async (token) => {
-  const User = mongoose.model('User');
-
-  const decodedToken = decodeToken(token);
+export const findAuthUser = async ({ authorization, models }) => {
+  const decodedToken = decodeToken(authorization);
 
   const authUser = decodedToken?.id
-    ? await User.findById(decodedToken.id)
+    ? await models.User.findByPk(decodedToken.id)
     : null;
 
   return authUser;
-};
-
-export const idResolver = {
-  id: (model) => model._id,
 };

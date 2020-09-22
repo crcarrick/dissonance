@@ -1,12 +1,25 @@
-export const message = ({ sequelize, Sequelize }) => {
-  const Message = sequelize.define('message', {
-    text: Sequelize.STRING,
-  });
+import { DataTypes, Model } from 'sequelize';
 
-  Message.associate = (models) => {
-    Message.belongsTo(models.Channel);
-    Message.belongsTo(models.User, { as: 'author' });
-  };
+export const message = ({ sequelize }) => {
+  class Message extends Model {
+    static associate(models) {
+      Message.belongsTo(models.Channel, { foreignKey: 'channelId' });
+      Message.belongsTo(models.User, {
+        as: 'author',
+        foreignKey: 'authorId',
+      });
+    }
+  }
+
+  Message.init(
+    {
+      text: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    { sequelize, tableName: 'messages' }
+  );
 
   return Message;
 };
