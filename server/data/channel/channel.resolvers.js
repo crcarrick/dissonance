@@ -5,7 +5,7 @@ export const resolvers = {
   },
   Mutation: {
     createChannel: (_, { input: { name, serverId } }, { Channel }) =>
-      Channel.create({ name, serverId }),
+      Channel.create({ name, ServerId: serverId }),
   },
   Channel: {
     messages: (channel) => channel.getMessages(),

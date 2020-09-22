@@ -7,17 +7,8 @@ import jwt from 'jsonwebtoken';
 export const user = ({ sequelize }) => {
   class User extends Model {
     static associate(models) {
-      User.hasMany(models.Message, {
-        as: 'messages',
-        foreignKey: 'authorId',
-      });
-      User.hasMany(models.Server, {
-        foreignKey: 'ownerId',
-      });
-
       User.belongsToMany(models.Server, {
         through: models.UserServer,
-        foreignKey: 'userId',
       });
     }
 
@@ -63,7 +54,7 @@ export const user = ({ sequelize }) => {
         allowNull: false,
       },
     },
-    { sequelize, tableName: 'users' }
+    { sequelize }
   );
 
   User.beforeCreate((user) => {

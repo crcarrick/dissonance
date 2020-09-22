@@ -24,7 +24,7 @@ export const connectDatabase = () => {
 
   class UserServer extends Model {}
 
-  UserServer.init({}, { sequelize, tableName: 'users_servers' });
+  UserServer.init({}, { sequelize });
 
   const models = { Channel, Message, Server, User, UserServer };
 

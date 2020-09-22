@@ -3,10 +3,9 @@ import { DataTypes, Model } from 'sequelize';
 export const message = ({ sequelize }) => {
   class Message extends Model {
     static associate(models) {
-      Message.belongsTo(models.Channel, { foreignKey: 'channelId' });
       Message.belongsTo(models.User, {
-        as: 'author',
-        foreignKey: 'authorId',
+        as: 'Author',
+        foreignKey: 'AuthorId',
       });
     }
   }
@@ -18,7 +17,7 @@ export const message = ({ sequelize }) => {
         allowNull: false,
       },
     },
-    { sequelize, tableName: 'messages' }
+    { sequelize }
   );
 
   return Message;

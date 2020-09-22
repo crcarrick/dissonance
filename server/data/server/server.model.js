@@ -3,15 +3,16 @@ import { DataTypes, Model } from 'sequelize';
 export const server = ({ sequelize }) => {
   class Server extends Model {
     static associate(models) {
-      Server.hasMany(models.Channel, { foreignKey: 'serverId' });
+      Server.hasMany(models.Channel, {
+        onDelete: 'cascade',
+      });
 
       Server.belongsTo(models.User, {
-        as: 'owner',
-        foreignKey: 'ownerId',
+        as: 'Owner',
+        foreignKey: 'OwnerId',
       });
       Server.belongsToMany(models.User, {
         through: models.UserServer,
-        foreignKey: 'serverId',
       });
     }
   }
@@ -23,7 +24,7 @@ export const server = ({ sequelize }) => {
         allowNull: 'false',
       },
     },
-    { sequelize, tableName: 'servers' }
+    { sequelize }
   );
 
   return Server;

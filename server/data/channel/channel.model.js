@@ -3,9 +3,7 @@ import { DataTypes, Model } from 'sequelize';
 export const channel = ({ sequelize }) => {
   class Channel extends Model {
     static associate(models) {
-      Channel.hasMany(models.Message, { foreignKey: 'channelId' });
-
-      Channel.belongsTo(models.Server, { foreignKey: 'serverId' });
+      Channel.hasMany(models.Message, { onDelete: 'cascade' });
     }
   }
 
@@ -16,7 +14,7 @@ export const channel = ({ sequelize }) => {
         allowNull: false,
       },
     },
-    { sequelize, tableName: 'channels' }
+    { sequelize }
   );
 
   return Channel;

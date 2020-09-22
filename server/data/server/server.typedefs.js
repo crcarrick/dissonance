@@ -5,8 +5,9 @@ export const typeDefs = gql`
   type Server {
     id: ID!
     name: String!
-    channels: [Channel]!
     owner: User!
+    channels: [Channel]!
+    users: [User]!
   }
 
   type DeleteServerPayload {

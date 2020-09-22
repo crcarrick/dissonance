@@ -1,22 +1,27 @@
 const createServer = async (
   _,
   { input: { name } },
-  { user, Channel, Server }
+  { user, Channel, Server, UserServer }
 ) => {
   const server = await Server.create(
     {
       name,
-      ownerId: user.id,
-      channels: [{ name: 'welcome' }, { name: 'general' }],
+      OwnerId: user.id,
+      Channels: [{ name: 'welcome' }, { name: 'general' }],
     },
-    { include: { model: [Channel] } }
+    { include: { model: Channel } }
   );
+
+  UserServer.create({ UserId: user.id, ServerId: server.id });
 
   return server;
 };
 
-const deleteServer = async (_, { input: { id } }, { user, Server }) =>
-  Server.destroy({ where: { id, ownerId: user.id } });
+const deleteServer = async (_, { input: { id } }, { user, Server }) => {
+  await Server.destroy({ where: { id, OwnerId: user.id } });
+
+  return { id };
+};
 
 export const resolvers = {
   Query: {
@@ -29,5 +34,7 @@ export const resolvers = {
   },
   Server: {
     channels: (server) => server.getChannels(),
+    owner: (server) => server.getOwner(),
+    users: (server) => server.getUsers(),
   },
 };

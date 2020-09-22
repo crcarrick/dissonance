@@ -12,8 +12,8 @@ const createMessage = async (
   }
 
   const message = await Message.create({
-    authorId: user.id,
-    channelId,
+    AuthorId: user.id,
+    ChannelId: channelId,
     text,
   });
 
@@ -42,7 +42,7 @@ const messageAdded = {
 export const resolvers = {
   Query: {
     messages: (_, { input: { channelId } }, { Message }) =>
-      Message.findAll({ where: { channelId } }),
+      Message.findAll({ where: { ChannelId: channelId } }),
   },
   Mutation: {
     createMessage,
