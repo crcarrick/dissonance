@@ -1,12 +1,24 @@
-import mongoose, { Schema } from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
 
-const messageSchema = new Schema(
-  {
-    author: { type: Schema.Types.ObjectId, ref: 'User' },
-    channel: { type: Schema.Types.ObjectId, ref: 'Channel' },
-    text: String,
-  },
-  { timestamps: true }
-);
+export const message = ({ sequelize }) => {
+  class Message extends Model {
+    static associate(models) {
+      Message.belongsTo(models.User, {
+        as: 'Author',
+        foreignKey: 'AuthorId',
+      });
+    }
+  }
 
-export const Message = mongoose.model('Message', messageSchema);
+  Message.init(
+    {
+      text: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    { sequelize }
+  );
+
+  return Message;
+};

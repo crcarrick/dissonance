@@ -1,49 +1,31 @@
-import mongoose, { Schema } from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
 
-const serverSchema = new Schema(
-  {
-    name: String,
-    owner: { type: Schema.Types.ObjectId, ref: 'User' },
-  },
-  { timestamps: true }
-);
+export const server = ({ sequelize }) => {
+  class Server extends Model {
+    static associate(models) {
+      Server.hasMany(models.Channel, {
+        onDelete: 'cascade',
+      });
 
-serverSchema.pre('save', async function (next) {
-  if (this.isNew) {
-    await mongoose.model('Channel').create([
-      {
-        name: 'welcome',
-        server: this._id,
-      },
-      {
-        name: 'general',
-        server: this._id,
-      },
-    ]);
-
-    await mongoose
-      .model('User')
-      .findByIdAndUpdate(this.owner, { $push: { servers: this._id } });
-
-    next();
+      Server.belongsTo(models.User, {
+        as: 'Owner',
+        foreignKey: 'OwnerId',
+      });
+      Server.belongsToMany(models.User, {
+        through: models.UserServer,
+      });
+    }
   }
 
-  next();
-});
+  Server.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: 'false',
+      },
+    },
+    { sequelize }
+  );
 
-serverSchema.post(
-  'findOneAndDelete',
-  { document: true, query: false },
-  async function () {
-    const Channel = mongoose.model('Channel');
-    const User = mongoose.model('User');
-
-    await Channel.deleteMany({ server: this._id });
-    await User.updateMany(
-      { servers: { $in: [this._id] } },
-      { $pull: { servers: this._id } }
-    );
-  }
-);
-
-export const Server = mongoose.model('Server', serverSchema);
+  return Server;
+};

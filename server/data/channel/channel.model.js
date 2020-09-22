@@ -1,19 +1,21 @@
-import mongoose, { Schema } from 'mongoose';
+import { DataTypes, Model } from 'sequelize';
 
-const channelSchema = new Schema(
-  {
-    name: String,
-    server: { type: Schema.Types.ObjectId, ref: 'Server' },
-  },
-  { timestamps: true }
-);
-
-channelSchema.post(
-  'deleteMany',
-  { document: true, query: false },
-  async function () {
-    await mongoose.model('Message').deleteMany({ channel: this._id });
+export const channel = ({ sequelize }) => {
+  class Channel extends Model {
+    static associate(models) {
+      Channel.hasMany(models.Message, { onDelete: 'cascade' });
+    }
   }
-);
 
-export const Channel = mongoose.model('Channel', channelSchema);
+  Channel.init(
+    {
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    { sequelize }
+  );
+
+  return Channel;
+};

@@ -12,8 +12,8 @@ const createMessage = async (
   }
 
   const message = await Message.create({
-    author: user.id,
-    channel: channelId,
+    AuthorId: user.id,
+    ChannelId: channelId,
     text,
   });
 
@@ -35,14 +35,14 @@ const messageAdded = {
   subscribe: withFilter(
     (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED),
     ({ messageAdded: { channel } }, { input: { channelId } }) =>
-      channel.equals(channelId)
+      channel === channelId
   ),
 };
 
 export const resolvers = {
   Query: {
     messages: (_, { input: { channelId } }, { Message }) =>
-      Message.find({ channel: channelId }),
+      Message.findAll({ where: { ChannelId: channelId } }),
   },
   Mutation: {
     createMessage,
@@ -51,7 +51,7 @@ export const resolvers = {
     messageAdded,
   },
   Message: {
-    author: (message, _, { User }) => User.findById(message.author),
-    channel: (message, _, { Channel }) => Channel.findById(message.channel),
+    author: (message) => message.getAuthor(),
+    channel: (message) => message.getChannel(),
   },
 };

@@ -23,58 +23,64 @@ const baseTypeDefs = gql`
   type Subscription
 `;
 
-export * from './database';
+export const gqlConfig = ({ models }) =>
+  createConfig({
+    typeDefs: [
+      ...graphqlScalarTypeDefs,
 
-export const gqlConfig = createConfig({
-  typeDefs: [
-    ...graphqlScalarTypeDefs,
+      baseTypeDefs,
 
-    baseTypeDefs,
+      channel.typeDefs,
+      message.typeDefs,
+      server.typeDefs,
+      user.typeDefs,
+    ],
+    resolvers: [
+      graphqlScalarResolvers,
 
-    channel.typeDefs,
-    message.typeDefs,
-    server.typeDefs,
-    user.typeDefs,
-  ],
-  resolvers: [
-    graphqlScalarResolvers,
+      channel.resolvers,
+      message.resolvers,
+      server.resolvers,
+      user.resolvers,
+    ],
+    subscriptions: {
+      onConnect: async (connectionParams) => {
+        if (connectionParams.Authorization) {
+          const authUser = await findAuthUser({
+            authorization: connectionParams.Authorization,
+            models,
+          });
 
-    channel.resolvers,
-    message.resolvers,
-    server.resolvers,
-    user.resolvers,
-  ],
-  subscriptions: {
-    onConnect: async (connectionParams) => {
-      if (connectionParams.Authorization) {
-        const authUser = await findAuthUser(connectionParams.Authorization);
+          return { user: authUser };
+        }
 
-        return { user: authUser };
+        throw new AuthenticationError('Not authenticated');
+      },
+    },
+    context: async ({ req, connection }) => {
+      let authUser;
+      if (connection) {
+        authUser = connection.context.user;
+      } else {
+        authUser = await findAuthUser({
+          authorization: req.headers.authorization,
+          models,
+        });
       }
 
-      throw new AuthenticationError('Not authenticated');
+      return {
+        pubsub,
+
+        user: authUser,
+
+        Channel: models.Channel,
+        Message: models.Message,
+        Server: models.Server,
+        User: models.User,
+        UserServer: models.UserServer,
+      };
     },
-  },
-  context: async ({ req, connection }) => {
-    let authUser;
-    if (connection) {
-      authUser = connection.context.user;
-    } else {
-      authUser = await findAuthUser(req.headers.authorization);
-    }
-
-    return {
-      pubsub,
-
-      user: authUser,
-
-      Channel: channel.Channel,
-      Message: message.Message,
-      Server: server.Server,
-      User: user.User,
-    };
-  },
-  schemaDirectives: {
-    authenticated: AuthenticationDirective,
-  },
-});
+    schemaDirectives: {
+      authenticated: AuthenticationDirective,
+    },
+  });
