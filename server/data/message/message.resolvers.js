@@ -7,7 +7,9 @@ const createMessage = async (
   { input: { channelId, serverId, text } },
   { pubsub, user, Message }
 ) => {
-  if (user.servers.includes(serverId)) {
+  const servers = await user.getServers();
+
+  if (!servers.find((server) => server.id === serverId)) {
     throw new AuthenticationError('Not authorized');
   }
 
