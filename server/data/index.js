@@ -23,7 +23,7 @@ const baseTypeDefs = gql`
   type Subscription
 `;
 
-export const createGQLConfig = ({ services }) =>
+export const createGQLConfig = ({ connection: databaseConnection, services }) =>
   createConfig({
     typeDefs: [
       ...graphqlScalarTypeDefs,
@@ -71,6 +71,12 @@ export const createGQLConfig = ({ services }) =>
       return {
         pubsub,
         user: authUser,
+        loaders: {
+          ...channel.createChannelLoaders(databaseConnection),
+          ...message.createMessageLoaders(databaseConnection),
+          ...server.createServerLoaders(databaseConnection),
+          ...user.createUserLoaders(databaseConnection),
+        },
         ...services,
       };
     },

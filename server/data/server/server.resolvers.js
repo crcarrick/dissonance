@@ -12,8 +12,7 @@ const deleteServer = async (_, { input: { id } }, { user, serverService }) => {
 
 export const resolvers = {
   Query: {
-    server: (_, { input: { id } }, { serverService }) =>
-      serverService.findById(id),
+    server: (_, { input: { id } }, { loaders }) => loaders.server.load(id),
     servers: (_, __, { serverService }) => serverService.findAll(),
   },
   Mutation: {
@@ -21,10 +20,9 @@ export const resolvers = {
     deleteServer,
   },
   Server: {
-    channels: (server, _, { serverService }) =>
-      serverService.getChannels(server.id),
-    owner: (server, _, { serverService }) =>
-      serverService.getOwner(server.owner_id),
-    users: (server, _, { serverService }) => serverService.getUsers(server.id),
+    channels: (server, _, { loaders }) =>
+      loaders.channelsByServer.load(server.id),
+    owner: (server, _, { loaders }) => loaders.user.load(server.ownerId),
+    users: (server, _, { loaders }) => loaders.usersByServer.load(server.id),
   },
 };

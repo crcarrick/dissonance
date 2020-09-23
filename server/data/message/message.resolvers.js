@@ -52,9 +52,8 @@ export const resolvers = {
     messageAdded,
   },
   Message: {
-    author: (message, _, { messageService }) =>
-      messageService.getAuthor(message.authorId),
-    channel: (message, _, { ChannelService }) =>
-      ChannelService.getChannel(message.channelId),
+    author: (message, _, { loaders }) => loaders.user.load(message.authorId),
+    channel: (message, _, { loaders }) =>
+      loaders.channel.load(message.channelId),
   },
 };

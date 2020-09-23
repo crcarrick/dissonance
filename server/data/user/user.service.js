@@ -31,15 +31,6 @@ export class UserService extends DatabaseService {
     );
   }
 
-  getServers(id) {
-    return this.connection(TableNames.SERVERS).whereIn(
-      'id',
-      this.connection(TableNames.USERS_SERVERS)
-        .select('serverId')
-        .where('userId', id)
-    );
-  }
-
   async isMemberOfChannel({ channelId, userId }) {
     const channel = await this.connection(TableNames.CHANNELS)
       .whereIn(

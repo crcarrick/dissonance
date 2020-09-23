@@ -26,3 +26,19 @@ export const findAuthUser = async ({ authorization, userService }) => {
 
   return authUser;
 };
+
+export const mapTo = (keys, keyFn) => (rows) => {
+  const group = new Map(keys.map((key) => [key, null]));
+
+  rows.forEach((row) => group.set(keyFn(row), row));
+
+  return Array.from(group.values());
+};
+
+export const mapToMany = (keys, keyFn) => (rows) => {
+  const group = new Map(keys.map((key) => [key, []]));
+
+  rows.forEach((row) => (group.get(keyFn(row)) || []).push(row));
+
+  return Array.from(group.values());
+};
