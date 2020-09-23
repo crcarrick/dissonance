@@ -22,6 +22,7 @@ export const connectDatabase = () => {
   });
 
   return {
+    connection,
     services: {
       channelService: new ChannelService({ connection }),
       messageService: new MessageService({ connection }),

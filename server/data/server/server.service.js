@@ -36,21 +36,4 @@ export class ServerService extends DatabaseService {
 
     return id;
   }
-
-  getChannels(id) {
-    return this.connection(TableNames.CHANNELS).where('serverId', id);
-  }
-
-  getOwner(ownerId) {
-    return this.connection(TableNames.USERS).where('id', ownerId).first();
-  }
-
-  getUsers(id) {
-    return this.connection(TableNames.USERS).whereIn(
-      'id',
-      this.connection(TableNames.USERS_SERVERS)
-        .select('userId')
-        .where('serverId', id)
-    );
-  }
 }

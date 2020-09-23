@@ -27,12 +27,4 @@ export class MessageService extends DatabaseService {
 
     return message;
   }
-
-  getAuthor(authorId) {
-    return this.connection(TableNames.USERS).where('id', authorId).first();
-  }
-
-  getChannel(channelId) {
-    return this.connection(TableNames.CHANNELS).where('id', channelId).first();
-  }
 }

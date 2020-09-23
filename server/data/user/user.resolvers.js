@@ -57,7 +57,7 @@ export const resolvers = {
       userService.joinServer({ userId: user.id, serverId }),
   },
   AuthUser: {
-    servers: async (user, __, { userService }) =>
-      userService.getServers(user.id),
+    servers: async (user, __, { loaders }) =>
+      loaders.serversByUser.load(user.id),
   },
 };

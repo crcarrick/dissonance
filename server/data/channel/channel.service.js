@@ -16,8 +16,4 @@ export class ChannelService extends DatabaseService {
 
     return channel;
   }
-
-  getMessages(id) {
-    return this.connection(TableNames.MESSAGES).where('channelId', id);
-  }
 }

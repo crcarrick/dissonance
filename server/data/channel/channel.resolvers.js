@@ -1,7 +1,6 @@
 export const resolvers = {
   Query: {
-    channel: (_, { input: { id } }, { channelService }) =>
-      channelService.findById(id),
+    channel: (_, { input: { id } }, { loaders }) => loaders.channel.load(id),
     channels: (_, __, { channelService }) => channelService.findAll(),
   },
   Mutation: {
@@ -9,7 +8,7 @@ export const resolvers = {
       channelService.create({ name, serverId }),
   },
   Channel: {
-    messages: (channel, _, { channelService }) =>
-      channelService.getMessages(channel.id),
+    messages: (channel, _, { loaders }) =>
+      loaders.messagesByChannel.load(channel.id),
   },
 };
