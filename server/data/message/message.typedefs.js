@@ -7,17 +7,17 @@ export const typeDefs = gql`
     text: String!
     author: User!
     channel: Channel!
-    created_at: Timestamp!
-    updated_at: Timestamp!
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
   }
 
   type NewMessage {
     id: ID!
     text: String!
     author: User!
-    channel_id: String!
-    created_at: Timestamp!
-    updated_at: Timestamp!
+    channelId: String!
+    createdAt: Timestamp!
+    updatedAt: Timestamp!
   }
 
   # Message Inputs

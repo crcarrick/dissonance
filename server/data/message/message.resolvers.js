@@ -28,8 +28,8 @@ const createMessage = async (
       text,
       author: user,
       channel: message.channel,
-      created_at: message.created_at,
-      updated_at: message.updated_at,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
     },
   });
 
@@ -53,8 +53,8 @@ export const resolvers = {
   },
   Message: {
     author: (message, _, { messageService }) =>
-      messageService.getAuthor(message.author_id),
+      messageService.getAuthor(message.authorId),
     channel: (message, _, { ChannelService }) =>
-      ChannelService.getChannel(message.channel_id),
+      ChannelService.getChannel(message.channelId),
   },
 };

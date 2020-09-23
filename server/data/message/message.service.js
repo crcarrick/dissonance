@@ -1,33 +1,38 @@
 import { DatabaseService } from './../database.service';
 
-export class MessageService extends DatabaseService {
-  constructor({ connection }) {
-    super();
+import { TableNames } from './../constants';
 
-    this.connection = connection;
-    this.table = 'messages';
+export class MessageService extends DatabaseService {
+  table = TableNames.MESSAGES;
+
+  constructor(args) {
+    super(args);
   }
 
   async create({ text, authorId, channelId }) {
-    const [message] = await this.getTable()
-      .insert({ text, author_id: authorId, channel_id: channelId })
+    const [message] = await this.connection(TableNames.MESSAGES)
+      .insert({
+        text,
+        authorId,
+        channelId,
+      })
       .returning([
         'id',
         'text',
-        'author_id',
-        'channel_id',
-        'created_at',
-        'updated_at',
+        'authorId',
+        'channelId',
+        'createdAt',
+        'updatedAt',
       ]);
 
     return message;
   }
 
   getAuthor(authorId) {
-    return this.connection('users').where('id', authorId).first();
+    return this.connection(TableNames.USERS).where('id', authorId).first();
   }
 
   getChannel(channelId) {
-    return this.connection('channels').where('id', channelId).first();
+    return this.connection(TableNames.CHANNELS).where('id', channelId).first();
   }
 }

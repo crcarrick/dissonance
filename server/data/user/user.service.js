@@ -4,16 +4,17 @@ import jwt from 'jsonwebtoken';
 
 import { DatabaseService } from './../database.service';
 
-export class UserService extends DatabaseService {
-  constructor({ connection }) {
-    super();
+import { TableNames } from './../constants';
 
-    this.connection = connection;
-    this.table = 'users';
+export class UserService extends DatabaseService {
+  table = TableNames.USERS;
+
+  constructor(args) {
+    super(args);
   }
 
   findByEmail(email) {
-    return this.getTable().where('email', email).first();
+    return this.connection(TableNames.USERS).where('email', email).first();
   }
 
   generateJWT({ id, username }) {
@@ -31,19 +32,21 @@ export class UserService extends DatabaseService {
   }
 
   getServers(id) {
-    return this.connection('servers').whereIn(
+    return this.connection(TableNames.SERVERS).whereIn(
       'id',
-      this.connection('users_servers').select('server_id').where('user_id', id)
+      this.connection(TableNames.USERS_SERVERS)
+        .select('serverId')
+        .where('userId', id)
     );
   }
 
   async isMemberOfChannel({ channelId, userId }) {
-    const channel = await this.connection('channels')
+    const channel = await this.connection(TableNames.CHANNELS)
       .whereIn(
-        'server_id',
-        this.connection('users_servers')
-          .select('server_id')
-          .where('user_id', userId)
+        'serverId',
+        this.connection(TableNames.USERS_SERVERS)
+          .select('serverId')
+          .where('userId', userId)
       )
       .andWhere('id', channelId)
       .first();
@@ -52,16 +55,16 @@ export class UserService extends DatabaseService {
   }
 
   joinServer({ userId, serverId }) {
-    return this.connection('users_servers').insert({
-      user_id: userId,
-      server_id: serverId,
+    return this.connection(TableNames.USERS_SERVERS).insert({
+      userId,
+      serverId,
     });
   }
 
   async signup({ email, password, username }) {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
-    const [user] = await this.getTable()
+    const [user] = await this.connection(TableNames.USERS)
       .insert({ email, password: hashedPassword, username })
       .returning(['id', 'email', 'username']);
 

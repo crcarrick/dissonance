@@ -1,22 +1,23 @@
 import { DatabaseService } from './../database.service';
 
-export class ChannelService extends DatabaseService {
-  constructor({ connection }) {
-    super();
+import { TableNames } from './../constants';
 
-    this.connection = connection;
-    this.table = 'channels';
+export class ChannelService extends DatabaseService {
+  table = TableNames.CHANNELS;
+
+  constructor(args) {
+    super(args);
   }
 
   async create({ name, serverId }) {
-    const [channel] = await this.getTable()
-      .insert({ name, server_id: serverId })
-      .returning(['id', 'name', 'server_id']);
+    const [channel] = await this.connection(TableNames.CHANNELS)
+      .insert({ name, serverId })
+      .returning(['id', 'name', 'serverId']);
 
     return channel;
   }
 
   getMessages(id) {
-    return this.connection('messages').where('channel_id', id);
+    return this.connection(TableNames.MESSAGES).where('channelId', id);
   }
 }

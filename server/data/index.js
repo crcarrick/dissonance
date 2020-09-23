@@ -48,7 +48,7 @@ export const createGQLConfig = ({ services }) =>
         if (connectionParams.Authorization) {
           const authUser = await findAuthUser({
             authorization: connectionParams.Authorization,
-            services,
+            userService: services.userService,
           });
 
           return { user: authUser };
@@ -64,7 +64,7 @@ export const createGQLConfig = ({ services }) =>
       } else {
         authUser = await findAuthUser({
           authorization: req.headers.authorization,
-          services,
+          userService: services.userService,
         });
       }
 

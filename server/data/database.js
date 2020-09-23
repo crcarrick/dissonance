@@ -1,5 +1,8 @@
 import knex from 'knex';
 
+import camelCaseKeys from 'camelcase-keys';
+import { snakeCase } from 'snake-case';
+
 import { ChannelService } from './channel/channel.service';
 import { MessageService } from './message/message.service';
 import { ServerService } from './server/server.service';
@@ -14,6 +17,8 @@ export const connectDatabase = () => {
       user: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
     },
+    postProcessResponse: (result) => camelCaseKeys(result),
+    wrapIdentifier: (value, origImpl) => origImpl(snakeCase(value)),
   });
 
   return {

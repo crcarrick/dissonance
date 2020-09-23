@@ -1,13 +1,13 @@
 export class DatabaseService {
-  getTable() {
-    return this.connection(this.table);
+  constructor({ connection }) {
+    this.connection = connection;
   }
 
   findAll() {
-    return this.getTable();
+    return this.connection(this.table).select();
   }
 
   findById(id) {
-    return this.getTable().where('id', id).first();
+    return this.connection(this.table).where('id', id).first();
   }
 }

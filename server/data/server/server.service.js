@@ -1,35 +1,36 @@
 import { DatabaseService } from './../database.service';
 
-export class ServerService extends DatabaseService {
-  constructor({ connection }) {
-    super();
+import { TableNames } from './../constants';
 
-    this.connection = connection;
-    this.table = 'servers';
+export class ServerService extends DatabaseService {
+  table = TableNames.SERVERS;
+
+  constructor(args) {
+    super(args);
   }
 
   async create({ name, ownerId }) {
-    const [server] = await this.getTable()
-      .insert({ name, owner_id: ownerId })
-      .returning(['id', 'name', 'owner_id']);
+    const [server] = await this.connection(TableNames.SERVERS)
+      .insert({ name, ownerId })
+      .returning(['id', 'name', 'ownerId']);
 
-    await this.connection('channels').insert([
-      { name: 'welcome', server_id: server.id },
-      { name: 'general', server_id: server.id },
+    await this.connection(TableNames.CHANNELS).insert([
+      { name: 'welcome', serverId: server.id },
+      { name: 'general', serverId: server.id },
     ]);
-    await this.connection('users_servers').insert({
-      user_id: ownerId,
-      server_id: server.id,
+    await this.connection(TableNames.USERS_SERVERS).insert({
+      userId: ownerId,
+      serverId: server.id,
     });
 
     return server;
   }
 
   async delete({ id, ownerId }) {
-    await this.getTable()
+    await this.connection(TableNames.SERVERS)
       .where({
         id,
-        owner_id: ownerId,
+        ownerId,
       })
       .del();
 
@@ -37,17 +38,19 @@ export class ServerService extends DatabaseService {
   }
 
   getChannels(id) {
-    return this.connection('channels').where('server_id', id);
+    return this.connection(TableNames.CHANNELS).where('serverId', id);
   }
 
   getOwner(ownerId) {
-    return this.connection('users').where('id', ownerId).first();
+    return this.connection(TableNames.USERS).where('id', ownerId).first();
   }
 
   getUsers(id) {
-    return this.connection('users').whereIn(
+    return this.connection(TableNames.USERS).whereIn(
       'id',
-      this.connection('users_servers').select('user_id').where('server_id', id)
+      this.connection(TableNames.USERS_SERVERS)
+        .select('userId')
+        .where('serverId', id)
     );
   }
 }
