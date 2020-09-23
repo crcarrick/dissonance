@@ -17,11 +17,11 @@ export const decodeToken = (authorization) => {
   }
 };
 
-export const findAuthUser = async ({ authorization, userService }) => {
+export const findAuthUser = async ({ authorization, userLoader }) => {
   const decodedToken = decodeToken(authorization);
 
   const authUser = decodedToken?.id
-    ? await userService.findById(decodedToken.id)
+    ? await userLoader.load(decodedToken.id)
     : null;
 
   return authUser;

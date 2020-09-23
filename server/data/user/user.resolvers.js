@@ -3,9 +3,9 @@ import { ApolloError, AuthenticationError } from 'apollo-server';
 const loginUser = async (
   _,
   { input: { email, password } },
-  { userService }
+  { loaders, userService }
 ) => {
-  const user = await userService.findByEmail(email);
+  const user = await loaders.userByEmail.load(email);
 
   if (!user) {
     throw new AuthenticationError('Email does not exist');
