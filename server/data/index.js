@@ -23,7 +23,7 @@ const baseTypeDefs = gql`
   type Subscription
 `;
 
-export const gqlConfig = ({ models }) =>
+export const createGQLConfig = ({ services }) =>
   createConfig({
     typeDefs: [
       ...graphqlScalarTypeDefs,
@@ -48,7 +48,7 @@ export const gqlConfig = ({ models }) =>
         if (connectionParams.Authorization) {
           const authUser = await findAuthUser({
             authorization: connectionParams.Authorization,
-            models,
+            userService: services.userService,
           });
 
           return { user: authUser };
@@ -64,20 +64,14 @@ export const gqlConfig = ({ models }) =>
       } else {
         authUser = await findAuthUser({
           authorization: req.headers.authorization,
-          models,
+          userService: services.userService,
         });
       }
 
       return {
         pubsub,
-
         user: authUser,
-
-        Channel: models.Channel,
-        Message: models.Message,
-        Server: models.Server,
-        User: models.User,
-        UserServer: models.UserServer,
+        ...services,
       };
     },
     schemaDirectives: {

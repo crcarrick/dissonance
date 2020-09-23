@@ -26,18 +26,12 @@ export const typeDefs = gql`
   }
 
   input CreateMessageInput {
-    serverId: ID!
     channelId: ID!
     text: String!
   }
 
   input MessageAddedInput {
     channelId: ID!
-  }
-
-  # Message Queries
-  extend type Query {
-    messages(input: GetMessagesInput!): [Message] @authenticated
   }
 
   # Message Mutations

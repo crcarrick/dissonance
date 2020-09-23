@@ -1,34 +1,41 @@
 import { ApolloError, AuthenticationError } from 'apollo-server';
 
-const loginUser = async (_, { input: { email, password } }, { User }) => {
-  const user = await User.findOne({ where: { email } });
+const loginUser = async (
+  _,
+  { input: { email, password } },
+  { userService }
+) => {
+  const user = await userService.findByEmail(email);
 
   if (!user) {
     throw new AuthenticationError('Email does not exist');
   }
 
-  const match = user.validatePassword(password);
+  const match = userService.validatePassword({
+    candidate: password,
+    password: user.password,
+  });
 
   if (!match) {
     throw new AuthenticationError('Password does not match');
   }
 
-  return { token: user.generateJWT(), user };
+  return { token: userService.generateJWT(user), user };
 };
 
 const signupUser = async (
   _,
   { input: { email, password, username } },
-  { User }
+  { userService }
 ) => {
   try {
-    const user = await User.create({ email, password, username });
+    const user = await userService.signup({ email, password, username });
 
-    return { token: user.generateJWT(), user };
-  } catch ({ errors }) {
-    if (errors[0].path === 'email') {
+    return { token: userService.generateJWT(user), user };
+  } catch (error) {
+    if (error.constraint === 'users_email_unique') {
       throw new ApolloError(`Email is already in use`, 'SIGNUP_EMAIL_IN_USE');
-    } else if (errors[0].path === 'username') {
+    } else if (error.constraint === 'users_username_unique') {
       throw new ApolloError(
         `Username is already in use`,
         'SIGNUP_USERNAME_IN_USE'
@@ -46,13 +53,11 @@ export const resolvers = {
   Mutation: {
     loginUser,
     signupUser,
-    joinServer: async (_, { input: { serverId } }, { user, User }) => {
-      await user.addServer(serverId);
-
-      return User.findByPk(user.id);
-    },
+    joinServer: async (_, { input: { serverId } }, { user, userService }) =>
+      userService.joinServer({ userId: user.id, serverId }),
   },
   AuthUser: {
-    servers: (user) => user.getServers(),
+    servers: async (user, __, { userService }) =>
+      userService.getServers(user.id),
   },
 };

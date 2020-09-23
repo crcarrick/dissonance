@@ -1,22 +1,25 @@
-import { AuthenticationError, withFilter } from 'apollo-server';
+import { ApolloError, withFilter } from 'apollo-server';
 
 const MESSAGE_ADDED = 'MESSAGE_ADDED';
 
 const createMessage = async (
   _,
-  { input: { channelId, serverId, text } },
-  { pubsub, user, Message }
+  { input: { text, channelId } },
+  { pubsub, user, messageService, userService }
 ) => {
-  const servers = await user.getServers();
+  const authorized = await userService.isMemberOfChannel({
+    channelId,
+    userId: user.id,
+  });
 
-  if (!servers.find((server) => server.id === serverId)) {
-    throw new AuthenticationError('Not authorized');
+  if (!authorized) {
+    throw new ApolloError('Not authorized to send message to this channel');
   }
 
-  const message = await Message.create({
-    AuthorId: user.id,
-    ChannelId: channelId,
+  const message = await messageService.create({
     text,
+    authorId: user.id,
+    channelId,
   });
 
   pubsub.publish(MESSAGE_ADDED, {
@@ -42,10 +45,6 @@ const messageAdded = {
 };
 
 export const resolvers = {
-  Query: {
-    messages: (_, { input: { channelId } }, { Message }) =>
-      Message.findAll({ where: { ChannelId: channelId } }),
-  },
   Mutation: {
     createMessage,
   },
@@ -53,7 +52,9 @@ export const resolvers = {
     messageAdded,
   },
   Message: {
-    author: (message) => message.getAuthor(),
-    channel: (message) => message.getChannel(),
+    author: (message, _, { messageService }) =>
+      messageService.getAuthor(message.authorId),
+    channel: (message, _, { ChannelService }) =>
+      ChannelService.getChannel(message.channelId),
   },
 };

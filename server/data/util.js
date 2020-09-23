@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
 import { merge } from 'lodash';
 
 export const createConfig = (config) => {
@@ -18,11 +17,11 @@ export const decodeToken = (authorization) => {
   }
 };
 
-export const findAuthUser = async ({ authorization, models }) => {
+export const findAuthUser = async ({ authorization, userService }) => {
   const decodedToken = decodeToken(authorization);
 
   const authUser = decodedToken?.id
-    ? await models.User.findByPk(decodedToken.id)
+    ? await userService.findById(decodedToken.id)
     : null;
 
   return authUser;
