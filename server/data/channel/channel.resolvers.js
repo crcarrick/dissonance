@@ -1,13 +1,15 @@
 export const resolvers = {
   Query: {
-    channel: (_, { input: { id } }, { Channel }) => Channel.findByPk(id),
-    channels: (_, __, { Channel }) => Channel.findAll(),
+    channel: (_, { input: { id } }, { channelService }) =>
+      channelService.findById(id),
+    channels: (_, __, { channelService }) => channelService.findAll(),
   },
   Mutation: {
-    createChannel: (_, { input: { name, serverId } }, { Channel }) =>
-      Channel.create({ name, ServerId: serverId }),
+    createChannel: (_, { input: { name, serverId } }, { channelService }) =>
+      channelService.create({ name, serverId }),
   },
   Channel: {
-    messages: (channel) => channel.getMessages(),
+    messages: (channel, _, { channelService }) =>
+      channelService.getMessages(channel.id),
   },
 };

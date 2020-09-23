@@ -7,17 +7,17 @@ export const typeDefs = gql`
     text: String!
     author: User!
     channel: Channel!
-    createdAt: Timestamp!
-    updatedAt: Timestamp!
+    created_at: Timestamp!
+    updated_at: Timestamp!
   }
 
   type NewMessage {
     id: ID!
     text: String!
     author: User!
-    channelId: String!
-    createdAt: Timestamp!
-    updatedAt: Timestamp!
+    channel_id: String!
+    created_at: Timestamp!
+    updated_at: Timestamp!
   }
 
   # Message Inputs
@@ -26,18 +26,12 @@ export const typeDefs = gql`
   }
 
   input CreateMessageInput {
-    serverId: ID!
     channelId: ID!
     text: String!
   }
 
   input MessageAddedInput {
     channelId: ID!
-  }
-
-  # Message Queries
-  extend type Query {
-    messages(input: GetMessagesInput!): [Message] @authenticated
   }
 
   # Message Mutations

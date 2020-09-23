@@ -1,38 +1,27 @@
-import { Model, Sequelize } from 'sequelize';
+import knex from 'knex';
 
-import { channel } from './channel/channel.model';
-import { message } from './message/message.model';
-import { server } from './server/server.model';
-import { user } from './user/user.model';
+import { ChannelService } from './channel/channel.service';
+import { MessageService } from './message/message.service';
+import { ServerService } from './server/server.service';
+import { UserService } from './user/user.service';
 
 export const connectDatabase = () => {
-  const sequelize = new Sequelize(
-    process.env.DATABASE_NAME,
-    process.env.DATABASE_USERNAME,
-    process.env.DATABASE_PASSWORD,
-    {
+  const connection = knex({
+    client: 'postgres',
+    connection: {
       host: 'localhost',
-      dialect: 'postgres',
-      logging: false,
-    }
-  );
-
-  const Channel = channel({ sequelize });
-  const Message = message({ sequelize });
-  const Server = server({ sequelize });
-  const User = user({ sequelize });
-
-  class UserServer extends Model {}
-
-  UserServer.init({}, { sequelize });
-
-  const models = { Channel, Message, Server, User, UserServer };
-
-  Object.keys(models).forEach((key) => {
-    if ('associate' in models[key]) {
-      models[key].associate(models);
-    }
+      database: process.env.DATABASE_NAME,
+      user: process.env.DATABASE_USERNAME,
+      password: process.env.DATABASE_PASSWORD,
+    },
   });
 
-  return { models, sequelize };
+  return {
+    services: {
+      channelService: new ChannelService({ connection }),
+      messageService: new MessageService({ connection }),
+      serverService: new ServerService({ connection }),
+      userService: new UserService({ connection }),
+    },
+  };
 };

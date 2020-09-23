@@ -2,16 +2,14 @@ import 'dotenv/config';
 
 import { ApolloServer } from 'apollo-server';
 
+import { createGQLConfig } from './data';
 import { connectDatabase } from './data/database';
-import { gqlConfig } from './data';
 
-const { sequelize, models } = connectDatabase();
+const { services } = connectDatabase();
 
-sequelize.sync({ force: process.env.NODE_ENV === 'development' }).then(() => {
-  const server = new ApolloServer(gqlConfig({ models }));
+const server = new ApolloServer(createGQLConfig({ services }));
 
-  server.listen(process.env.PORT).then(({ subscriptionsUrl, url }) => {
-    console.log(`🚀 Server ready at ${url}`);
-    console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
-  });
+server.listen(process.env.PORT).then(({ subscriptionsUrl, url }) => {
+  console.log(`🚀 Server ready at ${url}`);
+  console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
 });
