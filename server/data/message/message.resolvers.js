@@ -1,47 +1,10 @@
-import { ApolloError, withFilter } from 'apollo-server';
+import { withFilter } from 'apollo-server';
 
-const MESSAGE_ADDED = 'MESSAGE_ADDED';
-
-const createMessage = async (
-  _,
-  { input: { text, channelId } },
-  { pubsub, user, messageService, userService }
-) => {
-  const authorized = await userService.isMemberOfChannel({
-    channelId,
-    userId: user.id,
-  });
-
-  if (!authorized) {
-    throw new ApolloError(
-      'Not authorized to send message to this channel',
-      'USER_NOT_AUTHORIZED'
-    );
-  }
-
-  const message = await messageService.create({
-    text,
-    authorId: user.id,
-    channelId,
-  });
-
-  pubsub.publish(MESSAGE_ADDED, {
-    messageAdded: {
-      id: message.id,
-      text,
-      author: user,
-      channel: message.channel,
-      createdAt: message.createdAt,
-      updatedAt: message.updatedAt,
-    },
-  });
-
-  return message;
-};
+import { MESSAGE_ADDED_EVENT } from './../constants';
 
 const messageAdded = {
   subscribe: withFilter(
-    (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED),
+    (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED_EVENT),
     ({ messageAdded: { channel } }, { input: { channelId } }) =>
       channel === channelId
   ),
@@ -49,14 +12,19 @@ const messageAdded = {
 
 export const resolvers = {
   Mutation: {
-    createMessage,
+    createMessage: (
+      _,
+      { input: { channelId, text } },
+      { dataSources: { messages } }
+    ) => messages.create({ channelId, text }),
   },
   Subscription: {
     messageAdded,
   },
   Message: {
-    author: (message, _, { loaders }) => loaders.user.load(message.authorId),
-    channel: (message, _, { loaders }) =>
-      loaders.channel.load(message.channelId),
+    author: (message, _, { dataSources: { users } }) =>
+      users.byIdLoader.load(message.authorId),
+    channel: (message, _, { dataSources: { channels } }) =>
+      channels.byIdLoader.load(message.channelId),
   },
 };

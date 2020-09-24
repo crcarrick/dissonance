@@ -5,7 +5,7 @@ export const typeDefs = gql`
   type Message {
     id: ID!
     text: String!
-    author: User!
+    author: AuthUser!
     channel: Channel!
     createdAt: Timestamp!
     updatedAt: Timestamp!
@@ -14,8 +14,8 @@ export const typeDefs = gql`
   type NewMessage {
     id: ID!
     text: String!
-    author: User!
-    channelId: String!
+    author: AuthUser!
+    channel: Channel!
     createdAt: Timestamp!
     updatedAt: Timestamp!
   }

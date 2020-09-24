@@ -1,14 +1,18 @@
 export const resolvers = {
   Query: {
-    channel: (_, { input: { id } }, { loaders }) => loaders.channel.load(id),
-    channels: (_, __, { channelService }) => channelService.findAll(),
+    channel: (_, { input: { id } }, { dataSources: { channels } }) =>
+      channels.byIdLoader.load(id),
+    channels: (_, __, { dataSources: { channels } }) => channels.get(),
   },
   Mutation: {
-    createChannel: (_, { input: { name, serverId } }, { channelService }) =>
-      channelService.create({ name, serverId }),
+    createChannel: (
+      _,
+      { input: { name, serverId } },
+      { dataSources: { channels } }
+    ) => channels.create({ name, serverId }),
   },
   Channel: {
-    messages: (channel, _, { loaders }) =>
-      loaders.messagesByChannel.load(channel.id),
+    messages: (channel, _, { dataSources: { messages } }) =>
+      messages.byChannelLoader.load(channel.id),
   },
 };
