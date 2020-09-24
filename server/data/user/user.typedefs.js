@@ -7,14 +7,16 @@ export const typeDefs = gql`
     email: String!
     username: String!
     password: String!
-    servers: [Server]
+    avatarUrl: String!
+    servers: [Server]!
   }
 
   type AuthUser {
     id: ID!
     email: String!
     username: String!
-    servers: [Server]
+    avatarUrl: String!
+    servers: [Server]!
   }
 
   type AuthPayload {
@@ -23,6 +25,10 @@ export const typeDefs = gql`
   }
 
   # User Inputs
+  input CreateUserSignedUrlInput {
+    fileName: String!
+  }
+
   input LoginUserInput {
     email: String!
     password: String!
@@ -40,7 +46,7 @@ export const typeDefs = gql`
 
   # User Queries
   extend type Query {
-    me: AuthUser @authenticated
+    me: AuthUser! @authenticated
   }
 
   # User Mutations
@@ -48,5 +54,8 @@ export const typeDefs = gql`
     loginUser(input: LoginUserInput!): AuthPayload!
     signupUser(input: SignupUserInput!): AuthPayload!
     joinServer(input: JoinServerInput!): AuthUser! @authenticated
+    createUserAvatarSignedUrl(
+      input: CreateUserSignedUrlInput!
+    ): SignedUrlPayload! @authenticated
   }
 `;

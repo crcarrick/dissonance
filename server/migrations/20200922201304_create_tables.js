@@ -14,6 +14,7 @@ exports.up = async (knex) => {
       users.string('email').unique().notNullable();
       users.string('password').notNullable();
       users.string('username').unique().notNullable();
+      users.string('avatar_url');
       users.timestamps(false, true);
     })
     /**
@@ -26,6 +27,7 @@ exports.up = async (knex) => {
         .notNullable()
         .defaultTo(knex.raw('uuid_generate_v4()'));
       servers.string('name').notNullable();
+      servers.string('avatar_url');
       servers.uuid('owner_id');
       servers
         .foreign('owner_id')

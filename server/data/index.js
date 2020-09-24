@@ -21,6 +21,11 @@ const baseTypeDefs = gql`
   type Query
   type Mutation
   type Subscription
+
+  type SignedUrlPayload {
+    signedUrl: URL!
+    url: URL!
+  }
 `;
 
 export const createGQLConfig = ({ connection: databaseConnection, services }) =>

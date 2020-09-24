@@ -1,6 +1,7 @@
 import { DatabaseService } from './../database.service';
 
 import { TableNames } from './../constants';
+import { createSignedUrl } from './../util';
 
 export class ServerService extends DatabaseService {
   table = TableNames.SERVERS;
@@ -26,6 +27,29 @@ export class ServerService extends DatabaseService {
     return server;
   }
 
+  createAvatarSignedUrl = async ({ fileName, serverId, userId }) => {
+    const server = await this.connection(TableNames.SERVERS)
+      .where('id', serverId)
+      .first();
+
+    const authorized = server.id === userId;
+
+    if (!authorized) {
+      throw new ApolloError(
+        'Not authorized to edit this server',
+        'USER_NOT_AUTHORIZED'
+      );
+    }
+
+    const signedUrl = await createSignedUrl(fileName);
+
+    await this.connection(TableNames.SERVERS)
+      .where('id', serverId)
+      .update('avatarUrl', signedUrl.url);
+
+    return signedUrl;
+  };
+
   async delete({ id, ownerId }) {
     await this.connection(TableNames.SERVERS)
       .where({
@@ -35,5 +59,11 @@ export class ServerService extends DatabaseService {
       .del();
 
     return id;
+  }
+
+  updateAvatarUrl({ url, serverId }) {
+    return this.connection(TableNames.SERVERS)
+      .where('id', serverId)
+      .update('avatarUrl', url);
   }
 }

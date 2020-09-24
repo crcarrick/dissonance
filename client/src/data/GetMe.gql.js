@@ -6,13 +6,14 @@ export const GET_ME = gql`
       id
       email
       username
+      avatarUrl
       servers {
         id
         name
+        avatarUrl
         channels {
           id
           name
-          server
         }
       }
     }

@@ -5,12 +5,23 @@ import jwt from 'jsonwebtoken';
 import { DatabaseService } from './../database.service';
 
 import { TableNames } from './../constants';
+import { createSignedUrl } from './../util';
 
 export class UserService extends DatabaseService {
   table = TableNames.USERS;
 
   constructor(args) {
     super(args);
+  }
+
+  async createAvatarSignedUrl({ fileName, userId }) {
+    const signedUrl = await createSignedUrl(fileName);
+
+    await this.connection(TableNames.USERS)
+      .where('id', userId)
+      .update('avatarUrl', signedUrl.url);
+
+    return signedUrl;
   }
 
   findByEmail(email) {
