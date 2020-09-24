@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "apollo-server": "^2.17.0",
+    "aws-sdk": "^2.759.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "camelcase-keys": "^6.2.2",
@@ -18,13 +19,14 @@
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.5",
     "lodash": "^4.17.20",
+    "mime-types": "^2.1.27",
     "mongoose": "^5.10.5",
     "mongoose-unique-validator": "^2.0.3",
     "pg": "^8.3.3",
     "sequelize": "^6.3.5",
     "snake-case": "^3.0.3",
     "socket.io": "^2.3.0",
-    "sqlite3": "^5.0.0"
+    "uuid": "^8.3.0"
   },
   "scripts": {
     "start": "nodemon --exec babel-node index.js",

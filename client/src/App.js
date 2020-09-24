@@ -11,9 +11,9 @@ import { Auth } from './features/auth';
 import { Home } from './features/home';
 
 export const App = () => {
-  const { data: { me: user } = {}, loading } = useQuery(GET_ME);
+  const { data, loading } = useQuery(GET_ME);
 
-  const canActivate = () => !!user;
+  const canActivate = () => Boolean(data?.me);
 
   return (
     <>

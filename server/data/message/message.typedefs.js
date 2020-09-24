@@ -36,11 +36,11 @@ export const typeDefs = gql`
 
   # Message Mutations
   extend type Mutation {
-    createMessage(input: CreateMessageInput!): Message @authenticated
+    createMessage(input: CreateMessageInput!): Message! @authenticated
   }
 
   # Message Subscriptions
   extend type Subscription {
-    messageAdded(input: MessageAddedInput!): NewMessage
+    messageAdded(input: MessageAddedInput!): NewMessage!
   }
 `;

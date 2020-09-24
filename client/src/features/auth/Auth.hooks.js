@@ -1,32 +1,42 @@
+import { useState } from 'react';
+
+import { useLazyQuery, useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import {
-  useDeepEqualCallback,
-  useDeepEqualEffect,
-  useMutation,
-  useRouter,
-} from '@dissonance/hooks';
+import { GET_ME } from '@dissonance/data';
+import { useRouter } from '@dissonance/hooks';
 
 export const useAuth = ({ initialValues, mutation }) => {
   const { history } = useRouter();
 
-  const [mutate, { data, error, loading }] = useMutation(mutation);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = useDeepEqualCallback(
-    (values) => mutate({ variables: { input: { ...values } } }),
-    [mutate]
-  );
+  const [mutate] = useMutation(mutation);
+  const [getMe] = useLazyQuery(GET_ME);
 
-  useDeepEqualEffect(() => {
-    if (data) {
-      const token = (data.loginUser || data.signupUser).token;
+  const handleSubmit = async (values) => {
+    try {
+      setLoading(true);
 
-      localStorage.setItem(process.env.REACT_APP_AUTH_TOKEN, token);
+      const { data } = await mutate({ variables: { input: { ...values } } });
 
-      history.push('/channels/@me');
+      localStorage.setItem(
+        process.env.REACT_APP_AUTH_TOKEN,
+        (data.loginUser || data.signupUser).token
+      );
+
+      await getMe();
+
+      setLoading(false);
+
+      history.push('/');
+    } catch (error) {
+      setError(error);
+      setLoading(false);
     }
-  }, [data]);
+  };
 
   const form = useFormik({
     initialValues,

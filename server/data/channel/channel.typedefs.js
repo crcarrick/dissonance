@@ -4,7 +4,7 @@ export const typeDefs = gql`
   # Channel Types
   type Channel {
     id: ID!
-    messages: [Message]
+    messages: [Message]!
     name: String!
     server: ID!
   }
@@ -21,12 +21,12 @@ export const typeDefs = gql`
 
   # Channel Queries
   extend type Query {
-    channel(input: GetChannelInput!): Channel
-    channels: [Channel]
+    channel(input: GetChannelInput!): Channel!
+    channels: [Channel]!
   }
 
   # Channel Mutations
   extend type Mutation {
-    createChannel(input: CreateChannelInput!): Channel
+    createChannel(input: CreateChannelInput!): Channel!
   }
 `;

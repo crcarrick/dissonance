@@ -16,6 +16,11 @@ export const resolvers = {
     servers: (_, __, { serverService }) => serverService.findAll(),
   },
   Mutation: {
+    createServerAvatarSignedUrl: (
+      _,
+      { input: { fileName, serverId } },
+      { user, serverService }
+    ) => serverService.createAvatarSignedUrl({ fileName, serverId, userId }),
     createServer,
     deleteServer,
   },

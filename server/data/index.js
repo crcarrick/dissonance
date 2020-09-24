@@ -21,6 +21,11 @@ const baseTypeDefs = gql`
   type Query
   type Mutation
   type Subscription
+
+  type SignedUrlPayload {
+    signedUrl: URL!
+    url: URL!
+  }
 `;
 
 export const createGQLConfig = ({ connection: databaseConnection, services }) =>
@@ -45,10 +50,12 @@ export const createGQLConfig = ({ connection: databaseConnection, services }) =>
     ],
     subscriptions: {
       onConnect: async (connectionParams) => {
+        const { user: userLoader } = user.createUserLoaders(databaseConnection);
+
         if (connectionParams.Authorization) {
           const authUser = await findAuthUser({
             authorization: connectionParams.Authorization,
-            userService: services.userService,
+            userLoader,
           });
 
           return { user: authUser };
@@ -58,25 +65,27 @@ export const createGQLConfig = ({ connection: databaseConnection, services }) =>
       },
     },
     context: async ({ req, connection }) => {
+      const loaders = {
+        ...channel.createChannelLoaders(databaseConnection),
+        ...message.createMessageLoaders(databaseConnection),
+        ...server.createServerLoaders(databaseConnection),
+        ...user.createUserLoaders(databaseConnection),
+      };
+
       let authUser;
       if (connection) {
         authUser = connection.context.user;
       } else {
         authUser = await findAuthUser({
           authorization: req.headers.authorization,
-          userService: services.userService,
+          userLoader: loaders.user,
         });
       }
 
       return {
         pubsub,
+        loaders,
         user: authUser,
-        loaders: {
-          ...channel.createChannelLoaders(databaseConnection),
-          ...message.createMessageLoaders(databaseConnection),
-          ...server.createServerLoaders(databaseConnection),
-          ...user.createUserLoaders(databaseConnection),
-        },
         ...services,
       };
     },

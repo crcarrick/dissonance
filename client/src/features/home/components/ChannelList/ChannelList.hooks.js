@@ -14,5 +14,14 @@ export const useChannelList = () => {
   const handleChannelClick = (channelId) => () =>
     history.push(`/channels/${server.id}/${channelId}`);
 
-  return { handleChannelClick, server };
+  return {
+    getChannelProps: ({ id }) => ({
+      key: id,
+      button: true,
+      onClick: handleChannelClick(id),
+      selected: id === match.params.channelId,
+    }),
+
+    server,
+  };
 };

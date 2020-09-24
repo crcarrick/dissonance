@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 
+import { List, ListItem, ListItemText } from '@material-ui/core';
+
 export const ChannelListContainer = styled.div`
   height: 100%;
   width: 240px;
@@ -15,4 +17,8 @@ export const ChannelListServerName = styled.div`
   height: 50px;
 `;
 
-export const ChannelListChannels = styled.div``;
+export const ChannelListChannels = styled(List)``;
+
+export const ChannelListChannel = styled(ListItem)``;
+
+export const ChannelListChannelText = styled(ListItemText)``;

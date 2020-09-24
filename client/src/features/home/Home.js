@@ -12,7 +12,11 @@ export const Home = () => {
   return (
     <HomeContainer>
       <Switch>
-        <Route path="/channels/:serverId/:channelId">
+        <Route exact path="/channels/:serverId">
+          <ServerList />
+          <ChannelList />
+        </Route>
+        <Route exact path="/channels/:serverId/:channelId">
           <ServerList />
           <ChannelList />
           <Channel />

@@ -19,6 +19,11 @@ export const typeDefs = gql`
     id: ID!
   }
 
+  input CreateServerSignedUrlInput {
+    fileName: String!
+    serverId: ID!
+  }
+
   input CreateServerInput {
     name: String!
   }
@@ -29,13 +34,16 @@ export const typeDefs = gql`
 
   # Server Queries
   extend type Query {
-    server(input: GetServerInput!): Server
-    servers: [Server]
+    server(input: GetServerInput!): Server!
+    servers: [Server]!
   }
 
   # Server Mutations
   extend type Mutation {
-    createServer(input: CreateServerInput!): Server @authenticated
-    deleteServer(input: DeleteServerInput!): DeleteServerPayload @authenticated
+    createServerAvatarSignedUrl(
+      input: CreateServerSignedUrlInput!
+    ): SignedUrlPayload! @authenticated
+    createServer(input: CreateServerInput!): Server! @authenticated
+    deleteServer(input: DeleteServerInput!): DeleteServerPayload! @authenticated
   }
 `;

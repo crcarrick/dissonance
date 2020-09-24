@@ -13,7 +13,10 @@ const createMessage = async (
   });
 
   if (!authorized) {
-    throw new ApolloError('Not authorized to send message to this channel');
+    throw new ApolloError(
+      'Not authorized to send message to this channel',
+      'USER_NOT_AUTHORIZED'
+    );
   }
 
   const message = await messageService.create({
