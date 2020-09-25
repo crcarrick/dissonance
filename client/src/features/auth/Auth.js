@@ -15,7 +15,7 @@ import {
   AuthButton,
   AuthErrors,
 } from './Auth.style';
-import { LOGIN_USER, SIGNUP_USER } from './Auth.gql';
+import { LOGIN, SIGNUP } from './Auth.gql';
 import { useAuth } from './Auth.hooks';
 
 import { AuthField } from './components/AuthField';
@@ -27,7 +27,7 @@ export const Auth = () => {
     match.params.type === 'login'
       ? { email: '', password: '' }
       : { email: '', username: '', password: '' };
-  const mutation = match.params.type === 'login' ? LOGIN_USER : SIGNUP_USER;
+  const mutation = match.params.type === 'login' ? LOGIN : SIGNUP;
 
   const { form, gqlErrors, loading } = useAuth({
     initialValues,

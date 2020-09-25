@@ -2,14 +2,6 @@ import { withFilter } from 'apollo-server';
 
 import { MESSAGE_ADDED_EVENT } from './../constants';
 
-const messageAdded = {
-  subscribe: withFilter(
-    (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED_EVENT),
-    ({ messageAdded: { channel } }, { input: { channelId } }) =>
-      channel === channelId
-  ),
-};
-
 export const resolvers = {
   Mutation: {
     createMessage: (
@@ -19,7 +11,13 @@ export const resolvers = {
     ) => messages.create({ channelId, text }),
   },
   Subscription: {
-    messageAdded,
+    messageAdded: {
+      subscribe: withFilter(
+        (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED_EVENT),
+        ({ messageAdded: { channel } }, { input: { channelId } }) =>
+          channel === channelId
+      ),
+    },
   },
   Message: {
     author: (message, _, { dataSources: { users } }) =>
