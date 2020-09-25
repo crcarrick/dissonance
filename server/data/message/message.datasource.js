@@ -17,6 +17,16 @@ export class MessageDataSource extends SQLDataSource {
     );
   }
 
+  async getByChannel(channelId) {
+    try {
+      const channel = await this.byChannelLoader.load(channelId);
+
+      return channel;
+    } catch (error) {
+      this.didEncounterError(error);
+    }
+  }
+
   async create({ channelId, text }) {
     try {
       const { pubsub, user } = this.context;

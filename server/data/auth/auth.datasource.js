@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { addDays, getUnixTime } from 'date-fns';
 import jwt from 'jsonwebtoken';
 
-import { SQLDataSource } from './../sql.datasource';
+import { SQLDataSource } from '../sql.datasource';
 
 export class AuthDataSource extends SQLDataSource {
   async login({ email, password }) {
@@ -54,12 +54,9 @@ export class AuthDataSource extends SQLDataSource {
       let err = error;
 
       if (error.constraint === 'users_email_unique') {
-        error = new ApolloError(
-          'Email is already in use',
-          'SIGNUP_EMAIL_IN_USE'
-        );
+        err = new ApolloError('Email is already in use', 'SIGNUP_EMAIL_IN_USE');
       } else if (error.constraint === 'users_username_unique') {
-        error = new ApolloError(
+        err = new ApolloError(
           'Username is already in use',
           'SIGNUP_USERNAME_IN_USE'
         );

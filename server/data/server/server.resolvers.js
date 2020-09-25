@@ -1,7 +1,7 @@
 export const resolvers = {
   Query: {
     server: (_, { input: { id } }, { dataSources: { servers } }) =>
-      servers.byIdLoader.load(id),
+      servers.getById(id),
     servers: (_, __, { dataSources: { servers } }) => servers.get(),
   },
   Mutation: {
@@ -18,13 +18,18 @@ export const resolvers = {
       servers.create({ name }),
     deleteServer: (_, { input: { id } }, { dataSources: { servers } }) =>
       servers.delete(id),
+    updateServer: (
+      _,
+      { input: { id, fields } },
+      { dataSources: { servers } }
+    ) => servers.update({ id, fields }),
   },
   Server: {
     channels: (server, _, { dataSources: { channels } }) =>
-      channels.byServerLoader.load(server.id),
+      channels.getByServer(server.id),
     owner: (server, _, { dataSources: { users } }) =>
-      users.byIdLoader.load(server.ownerId),
+      users.getById(server.ownerId),
     users: (server, _, { dataSources: { users } }) =>
-      users.byServerLoader.load(server.id),
+      users.getByServer(server.id),
   },
 };

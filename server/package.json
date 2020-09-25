@@ -28,19 +28,31 @@
     "sequelize": "^6.3.5",
     "snake-case": "^3.0.3",
     "socket.io": "^2.3.0",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "webpack-merge": "^5.1.4"
   },
   "scripts": {
     "start": "nodemon --exec babel-node index.js",
     "migrate": "./node_modules/.bin/knex migrate:latest",
     "seed": "babel-node seed.js"
   },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.5",
-    "faker": "^5.1.0",
-    "nodemon": "^2.0.4",
-    "sequelize-cli": "^6.2.0"
+    "@typescript-eslint/eslint-plugin": "2.x",
+    "@typescript-eslint/parser": "2.x",
+    "babel-eslint": "10.x",
+    "eslint": "6.x",
+    "eslint-config-react-app": "^5.2.1",
+    "eslint-plugin-flowtype": "4.x",
+    "eslint-plugin-import": "2.x",
+    "eslint-plugin-jsx-a11y": "6.x",
+    "eslint-plugin-react": "7.x",
+    "eslint-plugin-react-hooks": "2.x",
+    "nodemon": "^2.0.4"
   }
 }

@@ -14,4 +14,14 @@ export class ChannelDataSource extends SQLDataSource {
         .then(mapToMany(ids, (channel) => channel.serverId))
     );
   }
+
+  async getByServer(serverId) {
+    try {
+      const channel = await this.byServerLoader.load(serverId);
+
+      return channel;
+    } catch (error) {
+      this.didEncounterError(error);
+    }
+  }
 }

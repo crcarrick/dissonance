@@ -1,7 +1,7 @@
 export const resolvers = {
   Query: {
     channel: (_, { input: { id } }, { dataSources: { channels } }) =>
-      channels.byIdLoader.load(id),
+      channels.getById(id),
     channels: (_, __, { dataSources: { channels } }) => channels.get(),
   },
   Mutation: {
@@ -13,6 +13,6 @@ export const resolvers = {
   },
   Channel: {
     messages: (channel, _, { dataSources: { messages } }) =>
-      messages.byChannelLoader.load(channel.id),
+      messages.getByChannel(channel.id),
   },
 };

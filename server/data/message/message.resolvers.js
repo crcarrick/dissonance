@@ -21,8 +21,8 @@ export const resolvers = {
   },
   Message: {
     author: (message, _, { dataSources: { users } }) =>
-      users.byIdLoader.load(message.authorId),
+      users.getById(message.authorId),
     channel: (message, _, { dataSources: { channels } }) =>
-      channels.byIdLoader.load(message.channelId),
+      channels.getById(message.channelId),
   },
 };

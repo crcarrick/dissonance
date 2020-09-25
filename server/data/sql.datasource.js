@@ -3,19 +3,11 @@ import { DataSource } from 'apollo-datasource';
 import { InMemoryLRUCache } from 'apollo-server-caching';
 import crypto from 'crypto';
 import DataLoader from 'dataloader';
-import Knex from 'knex';
 
 import { mapTo } from './util';
 
-Knex.QueryBuilder.extend('cache', function (ttl) {
-  return _this.cacheQuery(ttl, this);
-});
-
 export class SQLDataSource extends DataSource {
-  cache = null;
-  context = {};
-  loadById = null;
-  table = '';
+  columns = [];
 
   constructor(dbClient, table) {
     super();
@@ -60,7 +52,9 @@ export class SQLDataSource extends DataSource {
 
   async get() {
     try {
-      const records = await this.db(this.table).select().cache();
+      const records = await this.cacheQuery({
+        query: this.db(this.table).select(),
+      });
 
       return records;
     } catch (error) {
@@ -70,7 +64,7 @@ export class SQLDataSource extends DataSource {
 
   async getById(id) {
     try {
-      const record = await this.db(this.table).where('id', id).select().cache();
+      const record = this.byIdLoader.load(id);
 
       return record;
     } catch (error) {
@@ -80,7 +74,7 @@ export class SQLDataSource extends DataSource {
 
   async update({ id, fields }) {
     try {
-      const record = await this.db(this.table)
+      const [record] = await this.db(this.table)
         .update(fields)
         .where('id', id)
         .returning(this.columns);
@@ -94,7 +88,7 @@ export class SQLDataSource extends DataSource {
   async delete(id) {
     try {
       const record = await this.db(this.table)
-        .delete()
+        .del()
         .where('id', id)
         .returning(['id']);
 

@@ -13,6 +13,6 @@ export const resolvers = {
   },
   AuthUser: {
     servers: async (user, __, { dataSources: { servers } }) =>
-      servers.byUserLoader.load(user.id),
+      servers.getByUser(user.id),
   },
 };

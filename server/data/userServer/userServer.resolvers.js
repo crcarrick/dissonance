@@ -3,7 +3,7 @@ export const resolvers = {
     joinServer: (
       _,
       { input: { serverId } },
-      { dataSources: { userServers } }
-    ) => userServers.joinServer(serverId),
+      { dataSources: { usersServers } }
+    ) => usersServers.joinServer(serverId),
   },
 };

@@ -3,9 +3,11 @@ import DataLoader from 'dataloader';
 
 import { TABLE_NAMES } from './../constants';
 import { SQLDataSource } from './../sql.datasource';
-import { mapToMany } from './../util';
+import { createSignedUrl, mapToMany } from './../util';
 
 export class ServerDataSource extends SQLDataSource {
+  columns = ['id', 'name', 'ownerId', 'createdAt', 'updatedAt'];
+
   constructor(dbClient, table) {
     super(dbClient, table);
 
@@ -16,6 +18,16 @@ export class ServerDataSource extends SQLDataSource {
         .select()
         .then(mapToMany(ids, (server) => server.userId))
     );
+  }
+
+  async getByUser(userId) {
+    try {
+      const servers = await this.byUserLoader.load(userId);
+
+      return servers;
+    } catch (error) {
+      this.didEncounterError(error);
+    }
   }
 
   async create(fields) {
