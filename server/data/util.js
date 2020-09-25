@@ -1,10 +1,12 @@
-import { ApolloError } from 'apollo-server';
+import { ApolloError, AuthenticationError } from 'apollo-server';
 import aws from 'aws-sdk';
-import jwt from 'jsonwebtoken';
+import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { merge } from 'lodash';
 import mime from 'mime-types';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+
+import { TABLE_NAMES } from './constants';
 
 export const createConfig = (config) => {
   return {
@@ -52,14 +54,25 @@ export const decodeToken = (authorization) => {
   }
 };
 
-export const findAuthUser = async ({ authorization, userLoader }) => {
-  const decodedToken = decodeToken(authorization);
+export const findAuthUser = async ({ authorization, dbClient }) => {
+  try {
+    const decodedToken = decodeToken(authorization);
 
-  const authUser = decodedToken?.id
-    ? await userLoader.load(decodedToken.id)
-    : null;
+    const authUser = decodedToken?.id
+      ? await dbClient(TABLE_NAMES.USERS)
+          .where('id', decodedToken.id)
+          .select()
+          .first()
+      : null;
 
-  return authUser;
+    return authUser;
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw new AuthenticationError('Token expired');
+    } else {
+      throw error;
+    }
+  }
 };
 
 export const mapTo = (keys, keyFn) => (rows) => {
