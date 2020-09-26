@@ -42,7 +42,6 @@ export class AuthDataSource extends SQLDataSource {
         .returning([
           'id',
           'email',
-          'password',
           'username',
           'avatarUrl',
           'createdAt',

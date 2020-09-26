@@ -5,6 +5,8 @@ import { SQLDataSource } from './../sql.datasource';
 import { createSignedUrl, mapTo, mapToMany } from './../util';
 
 export class UserDataSource extends SQLDataSource {
+  createS3SignedUrl = createSignedUrl;
+
   constructor(dbClient, table) {
     super(dbClient, table);
 
@@ -47,7 +49,7 @@ export class UserDataSource extends SQLDataSource {
     try {
       const { user } = this.context;
 
-      const signedUrl = await createSignedUrl(fileName);
+      const signedUrl = await this.createS3SignedUrl(fileName);
 
       await this.db(this.table)
         .where('id', user.id)

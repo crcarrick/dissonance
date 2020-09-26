@@ -7,6 +7,7 @@ import { createSignedUrl, mapToMany } from './../util';
 
 export class ServerDataSource extends SQLDataSource {
   columns = ['id', 'name', 'ownerId', 'createdAt', 'updatedAt'];
+  createS3SignedUrl = createSignedUrl;
 
   constructor(dbClient, table) {
     super(dbClient, table);
@@ -67,12 +68,18 @@ export class ServerDataSource extends SQLDataSource {
     try {
       const { user } = this.context;
 
-      await this.db(this.table).del().where({
-        id,
-        ownerId: user.id,
-      });
+      const server = await this.byIdLoader.load(id);
 
-      return { id };
+      if (server && server.ownerId === user.id) {
+        await this.db(this.table).del().where({
+          id,
+          ownerId: user.id,
+        });
+
+        return { id };
+      } else {
+        throw new ForbiddenError();
+      }
     } catch (error) {
       this.didEncounterError(error);
     }
@@ -94,7 +101,7 @@ export class ServerDataSource extends SQLDataSource {
         throw new ForbiddenError();
       }
 
-      const signedUrl = await createSignedUrl(fileName);
+      const signedUrl = await this.createS3SignedUrl(fileName);
 
       await this.db(this.table)
         .where('id', serverId)

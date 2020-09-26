@@ -29,11 +29,11 @@ export class SQLDataSource extends DataSource {
   }
 
   didEncounterError(error) {
-    console.log(error);
-
     if (error instanceof ApolloError) {
       throw error;
     } else {
+      console.log(error);
+
       throw new ApolloError('Something went wrong', 'INTERNAL_SERVER_ERROR');
     }
   }
