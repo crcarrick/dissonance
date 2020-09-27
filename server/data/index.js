@@ -88,5 +88,4 @@ export const createGQLConfig = ({ dbClient, dataSources }) =>
     schemaDirectives: {
       authenticated: AuthenticationDirective,
     },
-    mocks: true,
   });

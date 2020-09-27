@@ -50,6 +50,7 @@
     "@babel/preset-env": "^7.11.5",
     "@typescript-eslint/eslint-plugin": "2.x",
     "@typescript-eslint/parser": "2.x",
+    "apollo-server-testing": "^2.18.1",
     "babel-eslint": "10.x",
     "babel-jest": "^26.3.0",
     "eslint": "6.x",

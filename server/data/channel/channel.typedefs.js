@@ -6,7 +6,7 @@ export const typeDefs = gql`
     id: ID!
     messages: [Message]!
     name: String!
-    server: ID!
+    serverId: ID!
   }
 
   # Channel Inputs

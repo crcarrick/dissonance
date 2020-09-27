@@ -1,7 +1,7 @@
 import knex from 'knex';
 import mockKnex from 'mock-knex';
 
-import { SQLDataSource } from './../sql.datasource';
+import { SQLDataSource } from '../sql.datasource';
 
 describe('SQLDataSource', () => {
   const tracker = mockKnex.getTracker();

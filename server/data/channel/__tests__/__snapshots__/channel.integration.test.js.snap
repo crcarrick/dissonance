@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Channel Integration creates a channel 1`] = `
+Object {
+  "data": null,
+  "errors": Array [
+    [GraphQLError: Cannot return null for non-nullable field Channel.name.],
+  ],
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Channel Integration gets a channel 1`] = `
+Object {
+  "data": Object {
+    "channel": Object {
+      "id": "1",
+      "messages": Array [
+        Object {
+          "id": "1",
+        },
+      ],
+      "name": "Test Channel 1",
+      "serverId": "1",
+    },
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
+
+exports[`Channel Integration gets list of channels 1`] = `
+Object {
+  "data": Object {
+    "channels": Array [
+      Object {
+        "id": "1",
+        "messages": Array [
+          Object {
+            "id": "1",
+          },
+        ],
+        "name": "Test Channel 1",
+        "serverId": "1",
+      },
+      Object {
+        "id": "2",
+        "messages": Array [],
+        "name": "Test Channel 2",
+        "serverId": "1",
+      },
+      Object {
+        "id": "3",
+        "messages": Array [],
+        "name": "Test Channel 3",
+        "serverId": "1",
+      },
+    ],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
