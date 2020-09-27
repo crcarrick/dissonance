@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@dissonance/constants": ["./src/constants"],
+      "@dissonance/database": ["./src/database"],
+      "@dissonance/directives": ["./src/graphql/directives"],
+      "@dissonance/domains": ["./src/graphql/domains"],
+      "@dissonance/domains/*": ["./src/graphql/domains/*"],
+      "@dissonance/graphql/*": ["./src/graphql/*"],
+      "@dissonance/utils": ["./src/graphql/utils"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

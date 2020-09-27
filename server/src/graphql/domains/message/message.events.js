@@ -1,0 +1,1 @@
+export const MESSAGE_ADDED_EVENT = 'MESSAGE_ADDED';
