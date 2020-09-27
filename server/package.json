@@ -42,18 +42,16 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app"
+      "react-app",
+      "plugin:import/errors",
+      "plugin:import/warnings"
     ],
     "plugins": [
-      "import",
-      "module-resolver"
+      "import"
     ],
-    "rules": {
-      "module-resolver/use-alias": 2
-    },
     "settings": {
       "import/resolver": {
-        "babel-module": {}
+        "babel-module": true
       }
     }
   },
