@@ -4,20 +4,12 @@ import {
   resolvers as graphqlScalarResolvers,
 } from 'graphql-scalars';
 
-// import * as auth from '@dissonance/domains/auth';
-// import * as channel from '@dissonance/domains/channel';
-// import * as message from '@dissonance/domains/message';
-// import * as server from '@dissonance/domains/server';
-// import * as user from '@dissonance/domains/user';
-// import * as userServer from '@dissonance/domains/userServer';
-import {
-  auth,
-  channel,
-  message,
-  server,
-  user,
-  userServer,
-} from '@dissonance/domains';
+import * as auth from '@dissonance/domains/auth';
+import * as channel from '@dissonance/domains/channel';
+import * as message from '@dissonance/domains/message';
+import * as server from '@dissonance/domains/server';
+import * as user from '@dissonance/domains/user';
+import * as userServer from '@dissonance/domains/userServer';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 import {
