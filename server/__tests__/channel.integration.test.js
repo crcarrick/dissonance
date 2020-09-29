@@ -7,7 +7,7 @@ import {
   createDatabase,
   destroyDatabase,
   createServer,
-} from './util';
+} from './../__test_utils__';
 
 import { ChannelDataSource } from '@dissonance/domains/channel';
 import { MessageDataSource } from '@dissonance/domains/message';
