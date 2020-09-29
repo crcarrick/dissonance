@@ -1,4 +1,8 @@
+const { TokenExpiredError } = require('jsonwebtoken');
+
 module.exports = {
-  decode: (obj) => obj,
-  sign: (obj) => obj,
+  decode: jest.fn((obj) => obj),
+  sign: jest.fn((obj) => obj),
+  verify: jest.fn(),
+  TokenExpiredError,
 };

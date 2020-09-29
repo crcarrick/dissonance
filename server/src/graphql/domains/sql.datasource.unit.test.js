@@ -1,3 +1,4 @@
+import { ApolloError } from 'apollo-server';
 import crypto from 'crypto';
 import knex from 'knex';
 
@@ -10,27 +11,21 @@ describe('SQLDataSource', () => {
 
   let dbClient;
   let sql;
-  let resetCache;
   beforeAll(() => {
     dbClient = knex({});
 
     sql = new SQLDataSource(dbClient, 'foos');
 
-    resetCache = () =>
-      sql.initialize({
-        cache: {
-          get: jest.fn(),
-          set: jest.fn(),
-        },
-      });
-
-    resetCache();
+    sql.initialize({
+      cache: {
+        get: jest.fn(),
+        set: jest.fn(),
+      },
+    });
   });
 
-  describe('gets', () => {
+  describe('Gets', () => {
     test('all', async () => {
-      resetCache();
-
       dbClient().select.mockReturnValueOnce([record1, record2, record3]);
 
       const expected = await sql.get();
@@ -57,8 +52,8 @@ describe('SQLDataSource', () => {
     });
   });
 
-  describe('creates', () => {
-    test('a new record', async () => {
+  describe('Creates', () => {
+    test('new records', async () => {
       dbClient().returning.mockReturnValueOnce([record1]);
 
       const expected = await sql.create(record1);
@@ -68,8 +63,8 @@ describe('SQLDataSource', () => {
     });
   });
 
-  describe('updates', () => {
-    test('a record by id', async () => {
+  describe('Updates', () => {
+    test('records by id', async () => {
       dbClient().returning.mockReturnValueOnce([record1]);
 
       const expected = await sql.update({ id: record1.id, fields: record1 });
@@ -80,8 +75,8 @@ describe('SQLDataSource', () => {
     });
   });
 
-  describe('deletes', () => {
-    test('a record by id', async () => {
+  describe('Deletes', () => {
+    test('records by id', async () => {
       dbClient().returning.mockReturnValueOnce([{ id: record1.id }]);
 
       const expected = await sql.delete(record1.id);
@@ -92,12 +87,10 @@ describe('SQLDataSource', () => {
     });
   });
 
-  describe('caches', () => {
+  describe('Caches', () => {
     let createHashMock;
     let hashMock;
     beforeEach(() => {
-      resetCache();
-
       hashMock = {
         update: jest.fn().mockReturnThis(),
         digest: jest.fn().mockReturnValueOnce('key'),
@@ -111,7 +104,7 @@ describe('SQLDataSource', () => {
       createHashMock.mockRestore();
     });
 
-    test('creates a unique cash key', async () => {
+    test('by a unique cash key', async () => {
       const query = {
         toString: () => 'test',
       };
@@ -154,6 +147,22 @@ describe('SQLDataSource', () => {
       expect(sql.cache.get.mock.calls.length).toBe(2);
       expect(sql.cache.set.mock.calls.length).toBe(1);
       expect(expected2).toEqual(rows);
+    });
+  });
+
+  describe('Errors', () => {
+    test('rethrows error if it is an instance of ApolloError', () => {
+      const error = new ApolloError('Test', 'TEST_ERROR');
+
+      expect(() => sql.didEncounterError(error)).toThrow(error);
+    });
+
+    test('throw generic INTERNAL_SERVER_ERROR if it is not an instance of ApolloError', () => {
+      const error = new Error('Test');
+
+      const expected = () => sql.didEncounterError(error, false);
+      expect(expected).toThrow(ApolloError);
+      expect(expected).toThrow('Something went wrong');
     });
   });
 });

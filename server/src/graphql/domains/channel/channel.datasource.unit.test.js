@@ -20,7 +20,7 @@ describe('ChannelDataSource', () => {
     channels = new ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS);
   });
 
-  describe('gets', () => {
+  describe('Gets', () => {
     test('channels by server using a dataloader', async () => {
       dbClient().select.mockReturnValueOnce(
         Promise.resolve([channel4, channel3, channel2, channel1])

@@ -30,7 +30,7 @@ describe('UserDataSource', () => {
     });
   });
 
-  describe('gets', () => {
+  describe('Gets', () => {
     test('user by email using a dataloader', async () => {
       dbClient().select.mockReturnValueOnce(Promise.resolve([user1]));
 
@@ -60,7 +60,7 @@ describe('UserDataSource', () => {
     });
   });
 
-  describe('signed urls', () => {
+  describe('Signed urls', () => {
     beforeEach(() => {
       users.createS3SignedUrl = jest.fn((fileName) => ({
         url: `www.test.com/${fileName}`,

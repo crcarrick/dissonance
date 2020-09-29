@@ -16,7 +16,7 @@ import {
   AuthenticationDirective,
   schemaDirectives,
 } from '@dissonance/directives';
-import { findAuthUser, mergeConfigs } from '@dissonance/utils';
+import { findAuthUser } from '@dissonance/utils';
 
 const pubsub = new PubSub();
 
@@ -33,72 +33,71 @@ const baseTypeDefs = gql`
   }
 `;
 
-export const createGQLConfig = ({ dbClient }) =>
-  mergeConfigs({
-    typeDefs: [
-      ...graphqlScalarTypeDefs,
+export const createGQLConfig = ({ dbClient }) => ({
+  typeDefs: [
+    ...graphqlScalarTypeDefs,
 
-      baseTypeDefs,
+    baseTypeDefs,
 
-      auth.typeDefs,
-      channel.typeDefs,
-      message.typeDefs,
-      server.typeDefs,
-      user.typeDefs,
-      userServer.typeDefs,
-    ],
-    resolvers: [
-      graphqlScalarResolvers,
+    auth.typeDefs,
+    channel.typeDefs,
+    message.typeDefs,
+    server.typeDefs,
+    user.typeDefs,
+    userServer.typeDefs,
+  ],
+  resolvers: [
+    graphqlScalarResolvers,
 
-      auth.resolvers,
-      channel.resolvers,
-      message.resolvers,
-      server.resolvers,
-      user.resolvers,
-      userServer.resolvers,
-    ],
-    subscriptions: {
-      onConnect: async (connectionParams) => {
-        if (connectionParams.Authorization) {
-          const authUser = await findAuthUser({
-            authorization: connectionParams.Authorization,
-            dbClient,
-          });
-
-          return { user: authUser };
-        }
-
-        throw new AuthenticationError('Not authenticated');
-      },
-    },
-    context: async ({ req, connection }) => {
-      let authUser;
-      if (connection) {
-        authUser = connection.context.user;
-      } else {
-        authUser = await findAuthUser({
-          authorization: req.headers.authorization,
+    auth.resolvers,
+    channel.resolvers,
+    message.resolvers,
+    server.resolvers,
+    user.resolvers,
+    userServer.resolvers,
+  ],
+  subscriptions: {
+    onConnect: async (connectionParams) => {
+      if (connectionParams.Authorization) {
+        const authUser = await findAuthUser({
+          authorization: connectionParams.Authorization,
           dbClient,
         });
+
+        return { user: authUser };
       }
 
-      return {
-        pubsub,
-        user: authUser,
-      };
+      throw new AuthenticationError('Not authenticated');
     },
-    dataSources: () => ({
-      auth: new auth.AuthDataSource(dbClient, TABLE_NAMES.USERS),
-      channels: new channel.ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS),
-      messages: new message.MessageDataSource(dbClient, TABLE_NAMES.MESSAGES),
-      servers: new server.ServerDataSource(dbClient, TABLE_NAMES.SERVERS),
-      users: new user.UserDataSource(dbClient, TABLE_NAMES.USERS),
-      usersServers: new userServer.UserServerDataSource(
+  },
+  context: async ({ req, connection }) => {
+    let authUser;
+    if (connection) {
+      authUser = connection.context.user;
+    } else {
+      authUser = await findAuthUser({
+        authorization: req.headers.authorization,
         dbClient,
-        TABLE_NAMES.USERS_SERVERS
-      ),
-    }),
-    schemaDirectives: {
-      authenticated: AuthenticationDirective,
-    },
-  });
+      });
+    }
+
+    return {
+      pubsub,
+      user: authUser,
+    };
+  },
+  dataSources: () => ({
+    auth: new auth.AuthDataSource(dbClient, TABLE_NAMES.USERS),
+    channels: new channel.ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS),
+    messages: new message.MessageDataSource(dbClient, TABLE_NAMES.MESSAGES),
+    servers: new server.ServerDataSource(dbClient, TABLE_NAMES.SERVERS),
+    users: new user.UserDataSource(dbClient, TABLE_NAMES.USERS),
+    usersServers: new userServer.UserServerDataSource(
+      dbClient,
+      TABLE_NAMES.USERS_SERVERS
+    ),
+  }),
+  schemaDirectives: {
+    authenticated: AuthenticationDirective,
+  },
+});

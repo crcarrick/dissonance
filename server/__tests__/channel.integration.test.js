@@ -13,7 +13,7 @@ import { ChannelDataSource } from '@dissonance/domains/channel';
 import { MessageDataSource } from '@dissonance/domains/message';
 import { TABLE_NAMES } from '@dissonance/constants';
 
-describe('Channel Integration', () => {
+xdescribe('Channel Integration', () => {
   const dbClient = createDbClient(knex);
 
   let query;

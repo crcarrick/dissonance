@@ -35,7 +35,7 @@ describe('AuthDataSource', () => {
     });
   });
 
-  describe('login', () => {
+  describe('Login', () => {
     test('authenticates with correct credentials', async () => {
       auth.context.dataSources.users.byEmailLoader.load.mockReturnValueOnce(
         user
@@ -78,7 +78,7 @@ describe('AuthDataSource', () => {
     });
   });
 
-  describe('signup', () => {
+  describe('Signup', () => {
     test('creates a new user', async () => {
       dbClient().returning.mockReturnValueOnce([user]);
 
