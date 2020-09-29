@@ -12,7 +12,7 @@ export const resolvers = {
     ) => auth.signup({ email, password, username }),
   },
   AuthUser: {
-    servers: async (user, __, { dataSources: { servers } }) =>
+    servers: async (user, _, { dataSources: { servers } }) =>
       servers.getByUser(user.id),
   },
 };

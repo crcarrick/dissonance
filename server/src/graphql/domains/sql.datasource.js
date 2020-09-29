@@ -38,18 +38,6 @@ export class SQLDataSource extends DataSource {
     }
   }
 
-  async create(fields) {
-    try {
-      const records = this.db(this.table)
-        .insert(fields)
-        .returning(this.columns);
-
-      return records;
-    } catch (error) {
-      this.didEncounterError(error);
-    }
-  }
-
   async get() {
     try {
       const records = await this.cacheQuery({
@@ -72,6 +60,18 @@ export class SQLDataSource extends DataSource {
     }
   }
 
+  async create(fields) {
+    try {
+      const records = this.db(this.table)
+        .insert(fields)
+        .returning(this.columns);
+
+      return records;
+    } catch (error) {
+      this.didEncounterError(error);
+    }
+  }
+
   async update({ id, fields }) {
     try {
       const [record] = await this.db(this.table)
@@ -87,7 +87,7 @@ export class SQLDataSource extends DataSource {
 
   async delete(id) {
     try {
-      const record = await this.db(this.table)
+      const [record] = await this.db(this.table)
         .del()
         .where('id', id)
         .returning(['id']);
@@ -99,10 +99,7 @@ export class SQLDataSource extends DataSource {
   }
 
   async cacheQuery({ ttl = 5, query }) {
-    const key = crypto
-      .createHash('sha1')
-      .update(query.toString())
-      .digest('base64');
+    const key = this.createKeyFromQuery(query);
 
     const cacheEntry = await this.cache.get(key);
 
@@ -117,5 +114,9 @@ export class SQLDataSource extends DataSource {
     }
 
     return rows;
+  }
+
+  createKeyFromQuery(query) {
+    return crypto.createHash('sha1').update(query.toString()).digest('base64');
   }
 }

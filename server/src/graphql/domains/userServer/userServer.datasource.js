@@ -1,3 +1,5 @@
+import { ForbiddenError } from 'apollo-server';
+
 import { SQLDataSource } from '@dissonance/domains/sql.datasource';
 
 export class UserServerDataSource extends SQLDataSource {
@@ -5,11 +7,15 @@ export class UserServerDataSource extends SQLDataSource {
     try {
       const { user } = this.context;
 
-      const [userServer] = await this.db(this.table)
-        .insert({ serverId, userId: user.id })
-        .returning(['serverId', 'userId']);
+      if (user) {
+        const [userServer] = await this.db(this.table)
+          .insert({ serverId, userId: user.id })
+          .returning(['serverId', 'userId']);
 
-      return userServer;
+        return userServer;
+      } else {
+        throw new ForbiddenError();
+      }
     } catch (error) {
       this.didEncounterError(error);
     }

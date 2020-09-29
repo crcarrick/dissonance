@@ -1,51 +1,43 @@
 import knex from 'knex';
-import mockKnex from 'mock-knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 
 import { ChannelDataSource } from './channel.datasource';
 
 describe('ChannelDataSource', () => {
-  const tracker = mockKnex.getTracker();
+  const [channel1, channel2, channel3, channel4] = new Array(4)
+    .fill(null)
+    .map((_, i) => ({
+      // use same serverId for channel3 & channel4 to test byServerLoader
+      serverId: i === 3 ? `${i}` : `${i + 1}`,
+    }));
 
+  let dbClient;
   let channels;
   beforeAll(() => {
-    const dbClient = knex({
-      client: 'postgres',
-      connection: '',
-      useNullAsDefault: false,
-    });
-
-    mockKnex.mock(dbClient);
+    dbClient = knex({});
 
     channels = new ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS);
   });
 
   describe('gets', () => {
-    beforeEach(() => {
-      tracker.install();
-    });
+    test('channels by server using a dataloader', async () => {
+      dbClient().select.mockReturnValueOnce(
+        Promise.resolve([channel4, channel3, channel2, channel1])
+      );
 
-    afterEach(() => {
-      tracker.uninstall();
-    });
+      const [expected1, expected2, expected3] = await Promise.all([
+        channels.getByServer(channel1.serverId),
+        channels.getByServer(channel2.serverId),
+        channels.getByServer(channel3.serverId),
+      ]);
 
-    test('channels by server', async () => {
-      const channel1 = { serverId: '1' };
-      const channel2 = { serverId: '2' };
-      const channel3 = { serverId: '3' };
+      expect(dbClient().select.mock.calls.length).toBe(1);
 
-      tracker.on('query', (query) => {
-        query.response([channel3, channel2, channel1]);
-      });
-
-      const [expected1] = await channels.getByServer(channel1.serverId);
-      const [expected2] = await channels.getByServer(channel2.serverId);
-      const [expected3] = await channels.getByServer(channel3.serverId);
-
-      expect(expected1).toEqual(channel1);
-      expect(expected2).toEqual(channel2);
-      expect(expected3).toEqual(channel3);
+      expect(expected1).toContain(channel1);
+      expect(expected2).toContain(channel2);
+      expect(expected3).toContain(channel3);
+      expect(expected3).toContain(channel4);
     });
   });
 });

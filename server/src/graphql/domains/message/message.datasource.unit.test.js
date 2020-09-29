@@ -1,6 +1,5 @@
 import { ForbiddenError } from 'apollo-server';
 import knex from 'knex';
-import mockKnex from 'mock-knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 
@@ -8,35 +7,20 @@ import { MessageDataSource } from './message.datasource';
 import { MESSAGE_ADDED_EVENT } from './message.events';
 
 describe('MessageDataSource', () => {
-  const tracker = mockKnex.getTracker();
-  const message1 = {
-    id: '1',
-    text: 'foo',
-    authorId: '1',
-    channelId: '1',
-  };
-  const message2 = {
-    id: '2',
-    text: 'bar',
-    authorId: '1',
-    channelId: '2',
-  };
-  const message3 = {
-    id: '3',
-    text: 'baz',
-    authorId: '1',
-    channelId: '3',
-  };
+  const [message1, message2, message3, message4] = new Array(4)
+    .fill(null)
+    .map((_, i) => ({
+      id: `${i + 1}`,
+      text: `Message ${i}`,
+      authorId: '1',
+      // use same channelId for message3 & message4 to test byChannelLoader
+      channelId: i === 3 ? `${i}` : `${i + 1}`,
+    }));
 
+  let dbClient;
   let messages;
   beforeEach(() => {
-    const dbClient = knex({
-      client: 'postgres',
-      connection: '',
-      useNullAsDefault: false,
-    });
-
-    mockKnex.mock(dbClient);
+    dbClient = knex({});
 
     messages = new MessageDataSource(dbClient, TABLE_NAMES.MESSAGES);
 
@@ -52,67 +36,46 @@ describe('MessageDataSource', () => {
   });
 
   describe('gets', () => {
-    beforeEach(() => {
-      tracker.install();
-    });
+    test('messages by channel using a dataloader', async () => {
+      dbClient().select.mockReturnValueOnce(
+        Promise.resolve([message4, message3, message2, message1])
+      );
 
-    afterEach(() => {
-      tracker.uninstall();
-    });
+      const [expected1, expected2, expected3] = await Promise.all([
+        messages.getByChannel(message1.channelId),
+        messages.getByChannel(message2.channelId),
+        messages.getByChannel(message3.channelId),
+      ]);
 
-    test('messages by channel', async () => {
-      tracker.on('query', (query) => {
-        query.response([message3, message2, message1]);
-      });
+      expect(dbClient().select.mock.calls.length).toBe(1);
 
-      const [result1] = await messages.getByChannel(message1.channelId);
-      const [result2] = await messages.getByChannel(message2.channelId);
-      const [result3] = await messages.getByChannel(message3.channelId);
-
-      expect(result1).toEqual(message1);
-      expect(result2).toEqual(message2);
-      expect(result3).toEqual(message3);
+      expect(expected1).toContain(message1);
+      expect(expected2).toContain(message2);
+      expect(expected3).toContain(message3);
+      expect(expected3).toContain(message4);
     });
   });
 
   describe('creates', () => {
-    beforeEach(() => {
-      tracker.install();
-    });
-
-    afterEach(() => {
-      tracker.uninstall();
-    });
-
     test('new messages if authorized', async () => {
-      tracker.on('query', (query, step) => {
-        const authorizedResponse = () => query.response([true]);
-        const insertResponse = () => query.response([message1]);
-
-        const steps = [authorizedResponse, insertResponse];
-
-        if (step === 2) {
-          expect(query.method).toBe('insert');
-          expect(query.bindings).toContain(message1.text);
-          expect(query.bindings).toContain(message1.channelId);
-          expect(query.bindings).toContain(message1.authorId);
-        }
-
-        steps[step - 1]();
-      });
+      dbClient().first.mockReturnValueOnce(true);
+      dbClient().returning.mockReturnValueOnce([message1]);
 
       const expected = await messages.create({
-        text: message1.text,
         channelId: message1.channelId,
+        text: message1.text,
       });
 
+      expect(dbClient().insert.mock.calls[0][0]).toEqual({
+        authorId: messages.context.user.id,
+        channelId: message1.channelId,
+        text: message1.text,
+      });
       expect(expected).toEqual(message1);
     });
 
     test('throws the correct errors if not authorized', async () => {
-      tracker.on('query', (query) => {
-        query.response([false]);
-      });
+      dbClient().first.mockReturnValueOnce(false);
 
       await expect(
         messages.create({ text: message1.text, channelId: message1.channelId })
@@ -120,23 +83,20 @@ describe('MessageDataSource', () => {
     });
 
     test('publishes new messages to subscriptions', async () => {
-      tracker.on('query', (query, step) => {
-        const authorizedResponse = () => query.response([true]);
-        const insertResponse = () => query.response([message1]);
-
-        const steps = [authorizedResponse, insertResponse];
-
-        steps[step - 1]();
-      });
+      dbClient().first.mockReturnValueOnce(true);
+      dbClient().returning.mockReturnValueOnce([message1]);
 
       await messages.create({
-        text: message1.text,
         channelId: message1.channelId,
+        text: message1.text,
       });
 
-      expect(
-        messages.context.pubsub.publish
-      ).toHaveBeenCalledWith(MESSAGE_ADDED_EVENT, { messageAdded: message1 });
+      expect(messages.context.pubsub.publish.mock.calls[0][0]).toBe(
+        MESSAGE_ADDED_EVENT
+      );
+      expect(messages.context.pubsub.publish.mock.calls[0][1]).toEqual({
+        messageAdded: message1,
+      });
     });
   });
 });

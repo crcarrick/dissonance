@@ -1,11 +1,9 @@
 import { ApolloServer } from 'apollo-server';
 
 import { createGQLConfig } from '@dissonance/graphql/create-gql-config';
-import { connectDatabase } from '@dissonance/database';
+import { dbClient } from '@dissonance/database';
 
-const server = new ApolloServer(
-  createGQLConfig({ dbClient: connectDatabase() })
-);
+const server = new ApolloServer(createGQLConfig({ dbClient }));
 
 server.listen(process.env.PORT).then(({ subscriptionsUrl, url }) => {
   console.log(`🚀 Server ready at ${url}`);

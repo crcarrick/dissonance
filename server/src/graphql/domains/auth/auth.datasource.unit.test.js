@@ -1,38 +1,28 @@
 import knex from 'knex';
-import mockKnex from 'mock-knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 
 import { AuthDataSource } from './auth.datasource';
 
 describe('AuthDataSource', () => {
-  const tracker = mockKnex.getTracker();
   const user = {
     id: '1',
-    email: 'foo',
-    username: 'bar',
-    password: 'baz',
+    email: 'user1@test.com',
+    username: 'user1',
+    password: 'user1',
   };
 
+  let dbClient;
   let auth;
   beforeAll(() => {
     process.env.JWT_SECRET = 'supersecret';
 
-    const dbClient = knex({
-      client: 'postgres',
-      connection: '',
-      useNullAsDefault: false,
-    });
-
-    mockKnex.mock(dbClient);
+    dbClient = knex({});
 
     auth = new AuthDataSource(dbClient, TABLE_NAMES.USERS);
 
     auth.initialize({
-      cache: {
-        get: jest.fn(),
-        set: jest.fn(),
-      },
+      cache: {},
       context: {
         dataSources: {
           users: {
@@ -46,44 +36,42 @@ describe('AuthDataSource', () => {
   });
 
   describe('login', () => {
-    beforeEach(() => {});
-
-    afterEach(() => {});
-
     test('authenticates with correct credentials', async () => {
       auth.context.dataSources.users.byEmailLoader.load.mockReturnValueOnce(
         user
       );
 
-      const spy1 = jest.spyOn(auth, 'validatePassword');
-      const spy2 = jest.spyOn(auth, 'generateJWT');
+      const validatePasswordSpy = jest.spyOn(auth, 'validatePassword');
+      const generateJWTSpy = jest.spyOn(auth, 'generateJWT');
 
       const expected = await auth.login({
         email: user.email,
         password: user.password,
       });
 
-      expect(spy1).toHaveBeenCalledWith({
-        candidate: 'baz',
+      expect(validatePasswordSpy).toHaveBeenCalledWith({
+        candidate: user.password,
         password: user.password,
       });
-      expect(spy2).toHaveBeenCalledWith(user);
+      expect(generateJWTSpy).toHaveBeenCalledWith(user);
       expect(expected.token).toBeDefined();
       expect(expected.user).toEqual(user);
     });
 
-    test('throws the correct errors with incorrect credentials', async () => {
+    test('throws the correct error with incorrect email', async () => {
       auth.context.dataSources.users.byEmailLoader.load.mockReturnValueOnce(
         null
       );
-      await expect(auth.login({ email: '', password: '' })).rejects.toThrow(
-        'Email does not exist'
-      );
 
+      await expect(auth.login({})).rejects.toThrow('Email does not exist');
+    });
+
+    test('throws the correct error with incorrect password', async () => {
       auth.context.dataSources.users.byEmailLoader.load.mockReturnValueOnce({
         email: user.email,
-        password: 'qux',
+        password: 'user2',
       });
+
       await expect(
         auth.login({ email: user.email, password: user.password })
       ).rejects.toThrow('Password does not match');
@@ -91,53 +79,56 @@ describe('AuthDataSource', () => {
   });
 
   describe('signup', () => {
-    beforeEach(() => {
-      tracker.install();
-    });
-
-    afterEach(() => {
-      tracker.uninstall();
-    });
-
-    test('inserts a user', async () => {
-      tracker.on('query', (query) => {
-        query.response([user]);
-
-        expect(query.method).toBe('insert');
-        expect(query.bindings).toContain(user.email);
-        expect(query.bindings).toContain(user.password);
-        expect(query.bindings).toContain(user.username);
-      });
-
-      const { user: expected } = await auth.signup(user);
-
-      expect(expected).toEqual(user);
-    });
-
-    test('authenticates the new user', async () => {
-      tracker.on('query', (query) => {
-        query.response([user]);
-      });
+    test('creates a new user', async () => {
+      dbClient().returning.mockReturnValueOnce([user]);
 
       const expected = await auth.signup(user);
 
-      expect(expected.token).toBeDefined();
+      expect(dbClient().insert.mock.calls[0][0]).toEqual({
+        email: user.email,
+        password: user.password,
+        username: user.username,
+      });
       expect(expected.user).toEqual(user);
     });
 
-    test('throws the correct errors when signup fails', async () => {
-      tracker.on('query', (query, step) => {
-        const steps = [
-          () => query.reject({ constraint: 'users_email_unique' }),
-          () => query.reject({ constraint: 'users_username_unique' }),
-        ];
+    test('authenticates the new user', async () => {
+      dbClient().returning.mockReturnValueOnce([user]);
 
-        steps[step - 1]();
+      const expected = await auth.signup(user);
+
+      expect(dbClient().insert.mock.calls[0][0]).toEqual({
+        email: user.email,
+        password: user.password,
+        username: user.username,
+      });
+
+      expect(expected.token).toBeDefined();
+    });
+
+    test('throws the correct errors with existing email', async () => {
+      dbClient().returning.mockImplementationOnce(() => {
+        const error = new Error();
+
+        error.constraint = 'users_email_unique';
+
+        throw error;
       });
 
       await expect(auth.signup(user)).rejects.toThrow(
         'Email is already in use'
       );
+    });
+
+    test('throws the correct errors with existing username', async () => {
+      dbClient().returning.mockImplementationOnce(() => {
+        const error = new Error();
+
+        error.constraint = 'users_username_unique';
+
+        throw error;
+      });
+
       await expect(auth.signup(user)).rejects.toThrow(
         'Username is already in use'
       );
