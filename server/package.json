@@ -30,11 +30,12 @@
   },
   "scripts": {
     "start:dev": "env-cmd -f ./.env.development nodemon --exec babel-node src/index.js",
-    "start:prod": "env-cmd -f ./.env.production nodemon --exec babel-node src/index.js",
+    "start:prod": "nodemon --exec babel-node src/index.js",
     "migrate:dev": "env-cmd -f ./.env.development babel-node knex/migrate",
-    "migrate:prod": "env-cmd -f ./.env.production babel-node knex/migrate",
+    "migrate:prod": "babel-node knex/migrate",
     "seed:dev": "env-cmd -f ./.env.development babel-node knex/seed",
     "seed:test": "env-cmd -f ./.env.test babel-node knex/seed",
+    "test": "jest unit",
     "test:unit": "env-cmd -f ./.env.test jest unit",
     "test:integration": "env-cmd -f ./.env.test jest integration"
   },
