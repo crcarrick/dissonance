@@ -13,46 +13,71 @@
     "camelcase-keys": "^6.2.2",
     "dataloader": "^2.0.0",
     "date-fns": "^2.16.1",
-    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "graphql": "^15.3.0",
     "graphql-scalars": "^1.2.7",
     "graphql-tools": "^6.2.1",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.5",
+    "knex-migrate": "^1.7.4",
     "lodash": "^4.17.20",
     "mime-types": "^2.1.27",
-    "mongoose": "^5.10.5",
-    "mongoose-unique-validator": "^2.0.3",
     "pg": "^8.3.3",
     "sequelize": "^6.3.5",
     "snake-case": "^3.0.3",
     "socket.io": "^2.3.0",
-    "uuid": "^8.3.0",
-    "webpack-merge": "^5.1.4"
+    "uuid": "^8.3.0"
   },
   "scripts": {
-    "start": "nodemon --exec babel-node index.js",
-    "migrate": "./node_modules/.bin/knex migrate:latest",
-    "seed": "babel-node seed.js"
+    "start:dev": "env-cmd -f ./.env.development nodemon --exec babel-node src/index.js",
+    "start:prod": "env-cmd -f ./.env.production nodemon --exec babel-node src/index.js",
+    "migrate:dev": "env-cmd -f ./.env.development babel-node knex/migrate",
+    "migrate:prod": "env-cmd -f ./.env.production babel-node knex/migrate",
+    "seed:dev": "env-cmd -f ./.env.development babel-node knex/seed",
+    "seed:test": "env-cmd -f ./.env.test babel-node knex/seed",
+    "test:unit": "env-cmd -f ./.env.test jest unit",
+    "test:integration": "env-cmd -f ./.env.test jest integration"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "plugin:import/errors",
+      "plugin:import/warnings"
+    ],
+    "plugins": [
+      "import"
+    ],
+    "settings": {
+      "import/resolver": {
+        "babel-module": true
+      }
+    }
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
     "@babel/node": "^7.10.5",
+    "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.11.5",
+    "@types/jest": "^26.0.14",
     "@typescript-eslint/eslint-plugin": "2.x",
     "@typescript-eslint/parser": "2.x",
+    "apollo-server-testing": "^2.18.1",
     "babel-eslint": "10.x",
+    "babel-jest": "^26.3.0",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "casual": "^1.6.2",
+    "env-cmd": "^10.1.0",
     "eslint": "6.x",
     "eslint-config-react-app": "^5.2.1",
+    "eslint-import-resolver-babel-module": "^5.1.2",
     "eslint-plugin-flowtype": "4.x",
-    "eslint-plugin-import": "2.x",
+    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsx-a11y": "6.x",
+    "eslint-plugin-module-resolver": "^1.0.0",
     "eslint-plugin-react": "7.x",
     "eslint-plugin-react-hooks": "2.x",
-    "nodemon": "^2.0.4"
+    "jest": "^26.4.2",
+    "nodemon": "^2.0.4",
+    "sqlite3": "^5.0.0"
   }
 }

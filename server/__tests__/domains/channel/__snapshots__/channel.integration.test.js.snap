@@ -1,0 +1,116 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Channel Integration creates a channel 1`] = `
+Object {
+  "id": Any<String>,
+  "name": "Testing 123",
+  "serverId": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+}
+`;
+
+exports[`Channel Integration gets a channel 1`] = `
+Object {
+  "id": "75d3d6ae-379f-4d09-8b50-0fc37ba721f8",
+  "name": "welcome",
+  "serverId": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+}
+`;
+
+exports[`Channel Integration gets a channels messages 1`] = `
+Object {
+  "messages": Array [
+    Object {
+      "id": "8779f557-01ee-49e7-84e9-2ab193a1a964",
+      "text": "Eos quia aut excepturi numquam est accusamus voluptatem qui.",
+    },
+  ],
+}
+`;
+
+exports[`Channel Integration gets list of channels 1`] = `
+Array [
+  Object {
+    "id": "75d3d6ae-379f-4d09-8b50-0fc37ba721f8",
+    "name": "welcome",
+    "serverId": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+  },
+  Object {
+    "id": "6909a725-9df3-44fd-8cd9-c94072994670",
+    "name": "general",
+    "serverId": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+  },
+  Object {
+    "id": "5721cc81-f093-48ae-be45-dfea9f8557bb",
+    "name": "welcome",
+    "serverId": "1267b1ac-3833-420f-b8a4-a4f25dbbc73f",
+  },
+  Object {
+    "id": "1617f2f7-b141-4620-86c5-bdbf044d268f",
+    "name": "general",
+    "serverId": "1267b1ac-3833-420f-b8a4-a4f25dbbc73f",
+  },
+  Object {
+    "id": "5fd6a8d0-e7b4-4aa6-a9a4-3198ecfa88dd",
+    "name": "welcome",
+    "serverId": "df5bb0e8-1143-459f-8fa2-cf5034a55764",
+  },
+  Object {
+    "id": "b019461f-52e7-4cd2-b7c1-57082e2115fe",
+    "name": "general",
+    "serverId": "df5bb0e8-1143-459f-8fa2-cf5034a55764",
+  },
+]
+`;
+
+exports[`Channel Integration gets list of channels with messages 1`] = `
+Array [
+  Object {
+    "messages": Array [
+      Object {
+        "id": "8779f557-01ee-49e7-84e9-2ab193a1a964",
+        "text": "Eos quia aut excepturi numquam est accusamus voluptatem qui.",
+      },
+    ],
+  },
+  Object {
+    "messages": Array [
+      Object {
+        "id": "7dfb9998-d327-434a-a18b-afb1a15aae3c",
+        "text": "Omnis quos aspernatur soluta quia eaque quas officia.",
+      },
+    ],
+  },
+  Object {
+    "messages": Array [
+      Object {
+        "id": "b9e5328c-980b-452a-9902-460dc7914afa",
+        "text": "Voluptatem quis sunt assumenda repellendus pariatur odio ut.",
+      },
+    ],
+  },
+  Object {
+    "messages": Array [
+      Object {
+        "id": "5d3f39ba-2f94-4e3c-a622-4c7b95a2bac1",
+        "text": "Nihil incidunt amet doloribus voluptas nihil.",
+      },
+    ],
+  },
+  Object {
+    "messages": Array [
+      Object {
+        "id": "a6bf3774-384a-487d-8f37-7e66e7a5d177",
+        "text": "Minus aspernatur corporis.",
+      },
+    ],
+  },
+  Object {
+    "messages": Array [
+      Object {
+        "id": "51bc78c4-3ea5-4759-853e-c4c06cea97ca",
+        "text": "Tempora et odio est impedit eligendi omnis natus harum.",
+      },
+    ],
+  },
+]
+`;
