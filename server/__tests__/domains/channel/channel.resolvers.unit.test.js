@@ -1,4 +1,4 @@
-import { resolvers } from './channel.resolvers';
+import { resolvers } from '@dissonance/domains/channel';
 
 describe('Channel Resolvers', () => {
   describe('Query', () => {

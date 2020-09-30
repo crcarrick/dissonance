@@ -8,8 +8,12 @@
       "@dissonance/domains": ["./src/graphql/domains"],
       "@dissonance/domains/*": ["./src/graphql/domains/*"],
       "@dissonance/graphql/*": ["./src/graphql/*"],
+      "@dissonance/test-utils": ["./__tests__/__test_utils__"],
       "@dissonance/utils": ["./src/graphql/utils"]
     }
+  },
+  "typeAcquisition": {
+    "include": ["jest"]
   },
   "exclude": ["node_modules"]
 }

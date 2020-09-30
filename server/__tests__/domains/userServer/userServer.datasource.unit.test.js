@@ -2,8 +2,7 @@ import { ForbiddenError } from 'apollo-server';
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
-
-import { UserServerDataSource } from './userServer.datasource';
+import { UserServerDataSource } from '@dissonance/domains/userServer';
 
 describe('UserServer', () => {
   let dbClient;

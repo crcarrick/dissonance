@@ -1,4 +1,4 @@
-import { resolvers } from './server.resolvers';
+import { resolvers } from '@dissonance/domains/server';
 
 describe('Server Resolvers', () => {
   describe('Query', () => {

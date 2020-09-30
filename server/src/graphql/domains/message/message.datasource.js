@@ -8,6 +8,8 @@ import { mapToMany } from '@dissonance/utils';
 import { MESSAGE_ADDED_EVENT } from './message.events';
 
 export class MessageDataSource extends SQLDataSource {
+  columns = ['id', 'text', 'authorId', 'channelId', 'createdAt', 'updatedAt'];
+
   constructor(dbClient, table) {
     super(dbClient, table);
 
@@ -50,14 +52,7 @@ export class MessageDataSource extends SQLDataSource {
 
       const [message] = await this.db(this.table)
         .insert({ authorId: user.id, channelId, text })
-        .returning([
-          'id',
-          'text',
-          'authorId',
-          'channelId',
-          'createdAt',
-          'updatedAt',
-        ]);
+        .returning(this.columns);
 
       pubsub.publish(MESSAGE_ADDED_EVENT, {
         messageAdded: message,

@@ -1,8 +1,7 @@
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
-
-import { ChannelDataSource } from './channel.datasource';
+import { ChannelDataSource } from '@dissonance/domains/channel';
 
 describe('ChannelDataSource', () => {
   const [channel1, channel2, channel3, channel4] = new Array(4)
@@ -22,9 +21,12 @@ describe('ChannelDataSource', () => {
 
   describe('Gets', () => {
     test('channels by server using a dataloader', async () => {
-      dbClient().select.mockReturnValueOnce(
-        Promise.resolve([channel4, channel3, channel2, channel1])
-      );
+      dbClient().select.mockResolvedValueOnce([
+        channel4,
+        channel3,
+        channel2,
+        channel1,
+      ]);
 
       const [expected1, expected2, expected3] = await Promise.all([
         channels.getByServer(channel1.serverId),

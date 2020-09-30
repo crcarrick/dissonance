@@ -6,7 +6,8 @@ import { SQLDataSource } from '@dissonance/domains/sql.datasource';
 import { createSignedUrl, mapToMany } from '@dissonance/utils';
 
 export class ServerDataSource extends SQLDataSource {
-  columns = ['id', 'name', 'ownerId', 'createdAt', 'updatedAt'];
+  columns = ['id', 'name', 'ownerId', 'avatarUrl', 'createdAt', 'updatedAt'];
+
   createS3SignedUrl = createSignedUrl;
 
   constructor(dbClient, table) {

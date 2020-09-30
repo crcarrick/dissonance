@@ -1,8 +1,7 @@
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
-
-import { AuthDataSource } from './auth.datasource';
+import { AuthDataSource } from '@dissonance/domains/auth';
 
 describe('AuthDataSource', () => {
   const user = {

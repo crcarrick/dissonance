@@ -3,6 +3,8 @@ import { ForbiddenError } from 'apollo-server';
 import { SQLDataSource } from '@dissonance/domains/sql.datasource';
 
 export class UserServerDataSource extends SQLDataSource {
+  columns = ['serverId', 'userId', 'createdAt', 'updatedAt'];
+
   async joinServer(serverId) {
     try {
       const { user } = this.context;

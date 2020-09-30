@@ -1,4 +1,4 @@
-import { resolvers } from './user.resolvers';
+import { resolvers } from '@dissonance/domains/user';
 
 describe('User Resolvers', () => {
   describe('Mutation', () => {

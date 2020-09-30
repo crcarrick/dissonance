@@ -2,7 +2,7 @@ import { ApolloError } from 'apollo-server';
 import crypto from 'crypto';
 import knex from 'knex';
 
-import { SQLDataSource } from './sql.datasource';
+import { SQLDataSource } from '@dissonance/domains/sql.datasource';
 
 describe('SQLDataSource', () => {
   const [record1, record2, record3] = new Array(3).fill(null).map((_, i) => ({
@@ -34,9 +34,7 @@ describe('SQLDataSource', () => {
     });
 
     test('by id using a dataloader', async () => {
-      dbClient().select.mockReturnValueOnce(
-        Promise.resolve([record3, record2, record1])
-      );
+      dbClient().select.mockResolvedValueOnce([record3, record2, record1]);
 
       const [expected1, expected2, expected3] = await Promise.all([
         sql.getById(record1.id),
@@ -59,7 +57,7 @@ describe('SQLDataSource', () => {
       const expected = await sql.create(record1);
 
       expect(dbClient().insert.mock.calls[0][0]).toEqual(record1);
-      expect(expected).toContain(record1);
+      expect(expected).toEqual(record1);
     });
   });
 

@@ -7,7 +7,7 @@ import DataLoader from 'dataloader';
 import { mapTo } from '@dissonance/utils';
 
 export class SQLDataSource extends DataSource {
-  columns = [];
+  columns = '*';
 
   constructor(dbClient, table) {
     super();
@@ -64,11 +64,11 @@ export class SQLDataSource extends DataSource {
 
   async create(fields) {
     try {
-      const records = this.db(this.table)
+      const [record] = await this.db(this.table)
         .insert(fields)
         .returning(this.columns);
 
-      return records;
+      return record;
     } catch (error) {
       this.didEncounterError(error);
     }

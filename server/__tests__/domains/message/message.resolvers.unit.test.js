@@ -1,5 +1,4 @@
-import { MESSAGE_ADDED_EVENT } from './message.events';
-import { resolvers } from './message.resolvers';
+import { MESSAGE_ADDED_EVENT, resolvers } from '@dissonance/domains/message';
 
 describe('Message Resolvers', () => {
   describe('Mutation', () => {

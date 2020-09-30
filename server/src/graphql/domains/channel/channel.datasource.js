@@ -4,6 +4,8 @@ import { SQLDataSource } from '@dissonance/domains/sql.datasource';
 import { mapToMany } from '@dissonance/utils';
 
 export class ChannelDataSource extends SQLDataSource {
+  columns = ['id', 'name', 'serverId', 'createdAt', 'updatedAt'];
+
   constructor(dbClient, table) {
     super(dbClient, table);
 

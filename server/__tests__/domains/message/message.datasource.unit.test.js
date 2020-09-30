@@ -2,9 +2,10 @@ import { ForbiddenError } from 'apollo-server';
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
-
-import { MessageDataSource } from './message.datasource';
-import { MESSAGE_ADDED_EVENT } from './message.events';
+import {
+  MESSAGE_ADDED_EVENT,
+  MessageDataSource,
+} from '@dissonance/domains/message';
 
 describe('MessageDataSource', () => {
   const [message1, message2, message3, message4] = new Array(4)
@@ -37,9 +38,12 @@ describe('MessageDataSource', () => {
 
   describe('gets', () => {
     test('messages by channel using a dataloader', async () => {
-      dbClient().select.mockReturnValueOnce(
-        Promise.resolve([message4, message3, message2, message1])
-      );
+      dbClient().select.mockResolvedValueOnce([
+        message4,
+        message3,
+        message2,
+        message1,
+      ]);
 
       const [expected1, expected2, expected3] = await Promise.all([
         messages.getByChannel(message1.channelId),

@@ -2,8 +2,7 @@ import { ForbiddenError } from 'apollo-server';
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
-
-import { ServerDataSource } from './server.datasource';
+import { ServerDataSource } from '@dissonance/domains/server';
 
 describe('ServerDataSource', () => {
   const [server1, server2, server3, server4] = new Array(4)
@@ -33,9 +32,12 @@ describe('ServerDataSource', () => {
 
   describe('Gets', () => {
     test('servers by user using a dataloader', async () => {
-      dbClient().select.mockReturnValueOnce(
-        Promise.resolve([server4, server3, server2, server1])
-      );
+      dbClient().select.mockResolvedValueOnce([
+        server4,
+        server3,
+        server2,
+        server1,
+      ]);
 
       const [expected1, expected2, expected3] = await Promise.all([
         servers.getByUser(server1.userId),

@@ -33,7 +33,7 @@ const baseTypeDefs = gql`
   }
 `;
 
-export const createGQLConfig = ({ dbClient }) => ({
+export const createGQLConfig = ({ context, dbClient }) => ({
   typeDefs: [
     ...graphqlScalarTypeDefs,
 
@@ -70,22 +70,24 @@ export const createGQLConfig = ({ dbClient }) => ({
       throw new AuthenticationError('Not authenticated');
     },
   },
-  context: async ({ req, connection }) => {
-    let authUser;
-    if (connection) {
-      authUser = connection.context.user;
-    } else {
-      authUser = await findAuthUser({
-        authorization: req.headers.authorization,
-        dbClient,
-      });
-    }
+  context: context
+    ? context
+    : async ({ req, connection }) => {
+        let authUser;
+        if (connection) {
+          authUser = connection.context.user;
+        } else {
+          authUser = await findAuthUser({
+            authorization: req.headers.authorization,
+            dbClient,
+          });
+        }
 
-    return {
-      pubsub,
-      user: authUser,
-    };
-  },
+        return {
+          pubsub,
+          user: authUser,
+        };
+      },
   dataSources: () => ({
     auth: new auth.AuthDataSource(dbClient, TABLE_NAMES.USERS),
     channels: new channel.ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS),

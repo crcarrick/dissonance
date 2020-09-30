@@ -1,4 +1,4 @@
-import { resolvers } from './auth.resolvers';
+import { resolvers } from '@dissonance/domains/auth';
 
 describe('Auth Resolvers', () => {
   describe('Query', () => {

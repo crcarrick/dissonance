@@ -5,8 +5,8 @@ export const typeDefs = gql`
   type User {
     id: ID!
     email: String!
-    username: String!
     password: String!
+    username: String!
     avatarUrl: String!
     servers: [Server]!
   }

@@ -1,4 +1,4 @@
-let getMockFns = () => ({
+const getMockFns = () => ({
   andWhere: jest.fn().mockReturnThis(),
   del: jest.fn().mockReturnThis(),
   delete: jest.fn().mockReturnThis(),

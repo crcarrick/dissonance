@@ -1,5 +1,7 @@
-exports.up = async (knex) => {
+export const up = async (knex) => {
   await knex.raw('create extension if not exists "uuid-ossp"');
+
+  const uuidGenerationRaw = 'uuid_generate_v4()';
 
   await knex.schema
     /**
@@ -10,7 +12,7 @@ exports.up = async (knex) => {
         .uuid('id')
         .primary()
         .notNullable()
-        .defaultTo(knex.raw('uuid_generate_v4()'));
+        .defaultTo(knex.raw(uuidGenerationRaw));
       users.string('email').unique().notNullable();
       users.string('password').notNullable();
       users.string('username').unique().notNullable();
@@ -25,7 +27,7 @@ exports.up = async (knex) => {
         .uuid('id')
         .primary()
         .notNullable()
-        .defaultTo(knex.raw('uuid_generate_v4()'));
+        .defaultTo(knex.raw(uuidGenerationRaw));
       servers.string('name').notNullable();
       servers.string('avatar_url');
       servers.uuid('owner_id');
@@ -44,7 +46,7 @@ exports.up = async (knex) => {
         .uuid('id')
         .primary()
         .notNullable()
-        .defaultTo(knex.raw('uuid_generate_v4()'));
+        .defaultTo(knex.raw(uuidGenerationRaw));
       channels.string('name').notNullable();
       channels.uuid('server_id');
       channels
@@ -62,7 +64,7 @@ exports.up = async (knex) => {
         .uuid('id')
         .primary()
         .notNullable()
-        .defaultTo(knex.raw('uuid_generate_v4()'));
+        .defaultTo(knex.raw(uuidGenerationRaw));
       messages.string('text').notNullable();
       messages.uuid('author_id');
       messages
@@ -105,19 +107,19 @@ exports.up = async (knex) => {
     'users_servers',
   ]) {
     await knex.raw(`
-      CREATE TRIGGER update_timestamp
-      BEFORE UPDATE
-      ON ${table}
-      FOR EACH ROW
-      EXECUTE PROCEDURE update_timestamp();
-    `);
+        CREATE TRIGGER update_timestamp
+        BEFORE UPDATE
+        ON ${table}
+        FOR EACH ROW
+        EXECUTE PROCEDURE update_timestamp();
+      `);
   }
 };
 
-exports.down = (knex) =>
+export const down = (knex) =>
   knex.schema
-    .dropTable('users')
-    .dropTable('servers')
-    .dropTable('channels')
+    .dropTable('users_servers')
     .dropTable('messages')
-    .dropTable('users_servers');
+    .dropTable('channels')
+    .dropTable('servers')
+    .dropTable('users');

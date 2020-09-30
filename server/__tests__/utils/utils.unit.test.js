@@ -5,8 +5,7 @@ import knex from 'knex';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 
-import { createSignedUrl } from './create-signed-url';
-import { findAuthUser } from './find-auth-user';
+import { createSignedUrl, findAuthUser } from '@dissonance/utils';
 
 describe('Utils', () => {
   describe('createSignedUrl', () => {

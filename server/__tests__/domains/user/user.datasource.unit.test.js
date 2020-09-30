@@ -1,8 +1,7 @@
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
-
-import { UserDataSource } from './user.datasource';
+import { UserDataSource } from '@dissonance/domains/user';
 
 describe('UserDataSource', () => {
   const [user1, user2, user3, user4] = new Array(4).fill(null).map((_, i) => ({
@@ -32,7 +31,7 @@ describe('UserDataSource', () => {
 
   describe('Gets', () => {
     test('user by email using a dataloader', async () => {
-      dbClient().select.mockReturnValueOnce(Promise.resolve([user1]));
+      dbClient().select.mockResolvedValueOnce([user1]);
 
       const expected = await users.getByEmail(user1.email);
 
@@ -41,9 +40,7 @@ describe('UserDataSource', () => {
     });
 
     test('users by server using a dataloader', async () => {
-      dbClient().select.mockReturnValueOnce(
-        Promise.resolve([user4, user3, user2, user1])
-      );
+      dbClient().select.mockResolvedValueOnce([user4, user3, user2, user1]);
 
       const [expected1, expected2, expected3] = await Promise.all([
         users.getByServer(user1.serverId),
