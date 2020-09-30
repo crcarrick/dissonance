@@ -35,9 +35,9 @@
     "migrate:prod": "babel-node knex/migrate",
     "seed:dev": "env-cmd -f ./.env.development babel-node knex/seed",
     "seed:test": "env-cmd -f ./.env.test babel-node knex/seed",
-    "test": "jest unit",
     "test:unit": "env-cmd -f ./.env.test jest unit",
-    "test:integration": "env-cmd -f ./.env.test jest integration"
+    "test:integration": "env-cmd -f ./.env.test jest integration",
+    "test": "jest unit --coverage && cat ./coverage/lcov.info | coveralls"
   },
   "eslintConfig": {
     "extends": [
@@ -67,6 +67,7 @@
     "babel-jest": "^26.3.0",
     "babel-plugin-module-resolver": "^4.0.0",
     "casual": "^1.6.2",
+    "coveralls": "^3.1.0",
     "env-cmd": "^10.1.0",
     "eslint": "6.x",
     "eslint-config-react-app": "^5.2.1",
