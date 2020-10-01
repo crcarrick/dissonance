@@ -6,7 +6,7 @@ const processors = {
   wrapIdentifier: (value, origImpl) => origImpl(snakeCase(value)),
 };
 
-module.exports = {
+export default {
   development: {
     client: 'pg',
     connection: {

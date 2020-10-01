@@ -8,7 +8,7 @@ const server = new ApolloServer(
   createGQLConfig({ dbClient: createDbClient(knex) })
 );
 
-server.listen(process.env.PORT).then(({ subscriptionsUrl, url }) => {
+server.listen(process.env.PORT || 4000).then(({ subscriptionsUrl, url }) => {
   console.log(`🚀 Server ready at ${url}`);
   console.log(`🚀 Subscriptions ready at ${subscriptionsUrl}`);
 });
