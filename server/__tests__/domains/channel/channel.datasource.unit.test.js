@@ -2,14 +2,13 @@ import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 import { ChannelDataSource } from '@dissonance/domains/channel';
+import { channelMock } from '@dissonance/test-utils';
 
 describe('ChannelDataSource', () => {
-  const [channel1, channel2, channel3, channel4] = new Array(4)
-    .fill(null)
-    .map((_, i) => ({
-      // use same serverId for channel3 & channel4 to test byServerLoader
-      serverId: i === 3 ? `${i}` : `${i + 1}`,
-    }));
+  const channel1 = channelMock();
+  const channel2 = channelMock();
+  const channel3 = channelMock();
+  const channel4 = channelMock({ serverId: channel3.serverId });
 
   let dbClient;
   let channels;
@@ -28,18 +27,21 @@ describe('ChannelDataSource', () => {
         channel1,
       ]);
 
-      const [expected1, expected2, expected3] = await Promise.all([
+      const expected = await Promise.all([
         channels.getByServer(channel1.serverId),
         channels.getByServer(channel2.serverId),
         channels.getByServer(channel3.serverId),
       ]);
 
-      expect(dbClient().select.mock.calls.length).toBe(1);
+      expect(dbClient().select).toHaveBeenCalledTimes(1);
 
-      expect(expected1).toContain(channel1);
-      expect(expected2).toContain(channel2);
-      expect(expected3).toContain(channel3);
-      expect(expected3).toContain(channel4);
+      expect(expected).toEqual(
+        expect.arrayContaining([
+          [channel1],
+          [channel2],
+          expect.arrayContaining([channel3, channel4]),
+        ])
+      );
     });
   });
 });

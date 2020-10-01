@@ -16,7 +16,7 @@ describe('User Resolvers', () => {
         { dataSources }
       );
 
-      expect(dataSources.users.createSignedUrl.mock.calls[0][0]).toBe(
+      expect(dataSources.users.createSignedUrl).toHaveBeenCalledWith(
         input.fileName
       );
     });

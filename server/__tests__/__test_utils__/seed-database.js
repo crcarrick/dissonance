@@ -1,8 +1,8 @@
 import { TABLE_NAMES } from '@dissonance/constants';
-import { generateData } from '@dissonance/test-utils';
+import { generateMockData } from '@dissonance/test-utils';
 
 export const seedDatabase = async (dbClient) => {
-  const seedData = generateData();
+  const seedData = generateMockData();
 
   await dbClient(TABLE_NAMES.USERS_SERVERS).del();
   await dbClient(TABLE_NAMES.MESSAGES).del();

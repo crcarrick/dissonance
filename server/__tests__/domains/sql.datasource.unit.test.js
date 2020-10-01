@@ -36,17 +36,15 @@ describe('SQLDataSource', () => {
     test('by id using a dataloader', async () => {
       dbClient().select.mockResolvedValueOnce([record3, record2, record1]);
 
-      const [expected1, expected2, expected3] = await Promise.all([
+      const expected = await Promise.all([
         sql.getById(record1.id),
         sql.getById(record2.id),
         sql.getById(record3.id),
       ]);
 
-      expect(dbClient().select.mock.calls.length).toBe(1);
+      expect(dbClient().select).toHaveBeenCalledTimes(1);
 
-      expect(expected1).toEqual(record1);
-      expect(expected2).toEqual(record2);
-      expect(expected3).toEqual(record3);
+      expect(expected).toEqual([record1, record2, record3]);
     });
   });
 
@@ -56,7 +54,7 @@ describe('SQLDataSource', () => {
 
       const expected = await sql.create(record1);
 
-      expect(dbClient().insert.mock.calls[0][0]).toEqual(record1);
+      expect(dbClient().insert).toHaveBeenCalledWith(record1);
       expect(expected).toEqual(record1);
     });
   });
@@ -67,8 +65,8 @@ describe('SQLDataSource', () => {
 
       const expected = await sql.update({ id: record1.id, fields: record1 });
 
-      expect(dbClient().update.mock.calls[0][0]).toEqual(record1);
-      expect(dbClient().where.mock.calls[0][1]).toBe(record1.id);
+      expect(dbClient().update).toHaveBeenCalledWith(record1);
+      expect(dbClient().where).toHaveBeenCalledWith('id', record1.id);
       expect(expected).toEqual(record1);
     });
   });
@@ -79,8 +77,8 @@ describe('SQLDataSource', () => {
 
       const expected = await sql.delete(record1.id);
 
-      expect(dbClient().del.mock.calls.length).toBe(1);
-      expect(dbClient().where.mock.calls[0][1]).toBe(record1.id);
+      expect(dbClient().del).toHaveBeenCalledTimes(1);
+      expect(dbClient().where).toHaveBeenCalledWith('id', record1.id);
       expect(expected).toEqual({ id: record1.id });
     });
   });
@@ -109,9 +107,9 @@ describe('SQLDataSource', () => {
 
       const expected = await sql.createKeyFromQuery(query);
 
-      expect(createHashMock.mock.calls[0][0]).toBe('sha1');
-      expect(hashMock.update.mock.calls[0][0]).toBe('test');
-      expect(hashMock.digest.mock.calls[0][0]).toBe('base64');
+      expect(createHashMock).toHaveBeenCalledWith('sha1');
+      expect(hashMock.update).toHaveBeenCalledWith('test');
+      expect(hashMock.digest).toHaveBeenCalledWith('base64');
       expect(expected).toBe('key');
     });
 
@@ -127,12 +125,17 @@ describe('SQLDataSource', () => {
         query,
       });
 
-      expect(sql.cache.get.mock.calls[0][0]).toBe('key');
-      expect(sql.cache.get.mock.calls.length).toBe(1);
-      expect(sql.cache.set.mock.calls[0][0]).toBe('key');
-      expect(sql.cache.set.mock.calls.length).toBe(1);
-      expect(sql.cache.set.mock.calls[0][1]).toBe(JSON.stringify(rows));
-      expect(sql.cache.set.mock.calls[0][2]).toEqual({ ttl });
+      expect(sql.cache.get).toHaveBeenCalledTimes(1);
+      expect(sql.cache.get).toHaveBeenNthCalledWith(1, 'key');
+      expect(sql.cache.set).toHaveBeenCalledTimes(1);
+      expect(sql.cache.set).toHaveBeenNthCalledWith(
+        1,
+        'key',
+        JSON.stringify(rows),
+        {
+          ttl,
+        }
+      );
       expect(expected1).toEqual(rows);
 
       sql.cache.get.mockReturnValueOnce(JSON.stringify(rows));
@@ -142,8 +145,8 @@ describe('SQLDataSource', () => {
         query,
       });
 
-      expect(sql.cache.get.mock.calls.length).toBe(2);
-      expect(sql.cache.set.mock.calls.length).toBe(1);
+      expect(sql.cache.get).toHaveBeenCalledTimes(2);
+      expect(sql.cache.set).toHaveBeenCalledTimes(1);
       expect(expected2).toEqual(rows);
     });
   });

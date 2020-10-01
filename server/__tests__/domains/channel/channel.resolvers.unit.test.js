@@ -12,7 +12,7 @@ describe('Channel Resolvers', () => {
 
       resolvers.Query.channel(null, { input }, { dataSources });
 
-      expect(dataSources.channels.getById.mock.calls[0][0]).toBe(input.id);
+      expect(dataSources.channels.getById).toHaveBeenCalledWith(input.id);
     });
 
     test('channels', () => {
@@ -24,7 +24,7 @@ describe('Channel Resolvers', () => {
 
       resolvers.Query.channels(null, null, { dataSources });
 
-      expect(dataSources.channels.get.mock.calls.length).toBe(1);
+      expect(dataSources.channels.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -39,7 +39,7 @@ describe('Channel Resolvers', () => {
 
       resolvers.Mutation.createChannel(null, { input }, { dataSources });
 
-      expect(dataSources.channels.create.mock.calls[0][0]).toEqual(input);
+      expect(dataSources.channels.create).toHaveBeenCalledWith(input);
     });
   });
 
@@ -54,7 +54,7 @@ describe('Channel Resolvers', () => {
 
       resolvers.Channel.messages(channel, null, { dataSources });
 
-      expect(dataSources.messages.getByChannel.mock.calls[0][0]).toBe(
+      expect(dataSources.messages.getByChannel).toHaveBeenCalledWith(
         channel.id
       );
     });

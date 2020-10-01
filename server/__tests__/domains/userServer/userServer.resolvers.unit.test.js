@@ -12,7 +12,7 @@ describe('UserServer Resolvers', () => {
 
       resolvers.Mutation.joinServer(null, { input }, { dataSources });
 
-      expect(dataSources.usersServers.joinServer.mock.calls[0][0]).toBe(
+      expect(dataSources.usersServers.joinServer).toHaveBeenCalledWith(
         input.serverId
       );
     });

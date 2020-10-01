@@ -3,17 +3,14 @@ import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 import { ServerDataSource } from '@dissonance/domains/server';
+import { serverMock, userMock } from '@dissonance/test-utils';
 
 describe('ServerDataSource', () => {
-  const [server1, server2, server3, server4] = new Array(4)
-    .fill(null)
-    .map((_, i) => ({
-      id: `${i + 1}`,
-      name: `Server ${i + 1}`,
-      // use same userId for server3 & server4 to test byUserLoader
-      userId: i === 3 ? `${i}` : `${i + 1}`,
-      ownerId: `${i + 1}`,
-    }));
+  const user = userMock();
+  const server1 = serverMock({ ownerId: user.id });
+  const server2 = serverMock();
+  const server3 = serverMock();
+  const server4 = serverMock({ userId: server3.userId });
 
   let dbClient;
   let servers;
@@ -25,7 +22,7 @@ describe('ServerDataSource', () => {
     servers.initialize({
       cache: {},
       context: {
-        user: { id: '1' },
+        user,
       },
     });
   });
@@ -39,18 +36,21 @@ describe('ServerDataSource', () => {
         server1,
       ]);
 
-      const [expected1, expected2, expected3] = await Promise.all([
+      const expected = await Promise.all([
         servers.getByUser(server1.userId),
         servers.getByUser(server2.userId),
         servers.getByUser(server3.userId),
       ]);
 
-      expect(dbClient().select.mock.calls.length).toBe(1);
+      expect(dbClient().select).toHaveBeenCalledTimes(1);
 
-      expect(expected1).toContain(server1);
-      expect(expected2).toContain(server2);
-      expect(expected3).toContain(server3);
-      expect(expected3).toContain(server4);
+      expect(expected).toEqual(
+        expect.arrayContaining([
+          [server1],
+          [server2],
+          expect.arrayContaining([server3, server4]),
+        ])
+      );
     });
   });
 
@@ -68,35 +68,36 @@ describe('ServerDataSource', () => {
     test('new servers', async () => {
       const expected = await servers.create(server1);
 
-      expect(dbClient().insert.mock.calls[0][0]).toEqual(
-        expect.objectContaining(server1)
-      );
-      expect(dbClient().into.mock.calls[0][0]).toEqual(TABLE_NAMES.SERVERS);
+      expect(dbClient().insert).toHaveBeenNthCalledWith(1, server1);
+      expect(dbClient().into).toHaveBeenNthCalledWith(1, TABLE_NAMES.SERVERS);
       expect(expected).toEqual(server1);
     });
 
     test('new welcome and general channels for newly created servers', async () => {
       await servers.create(server1);
 
-      expect(dbClient().insert.mock.calls[1][0]).toContainEqual({
-        name: 'welcome',
-        serverId: server1.id,
-      });
-      expect(dbClient().insert.mock.calls[1][0]).toContainEqual({
-        name: 'general',
-        serverId: server1.id,
-      });
-      expect(dbClient().into.mock.calls[1][0]).toEqual(TABLE_NAMES.CHANNELS);
+      expect(dbClient().insert).toHaveBeenNthCalledWith(2, [
+        {
+          name: 'welcome',
+          serverId: server1.id,
+        },
+        {
+          name: 'general',
+          serverId: server1.id,
+        },
+      ]);
+      expect(dbClient().into).toHaveBeenNthCalledWith(2, TABLE_NAMES.CHANNELS);
     });
 
     test('joins the creator to the server', async () => {
       await servers.create(server1);
 
-      expect(dbClient().insert.mock.calls[2][0]).toEqual({
+      expect(dbClient().insert).toHaveBeenNthCalledWith(3, {
         userId: servers.context.user.id,
         serverId: server1.id,
       });
-      expect(dbClient().into.mock.calls[2][0]).toEqual(
+      expect(dbClient().into).toHaveBeenNthCalledWith(
+        3,
         TABLE_NAMES.USERS_SERVERS
       );
     });
@@ -108,8 +109,8 @@ describe('ServerDataSource', () => {
 
       const expected = await servers.delete(server1.id);
 
-      expect(dbClient().del.mock.calls.length).toBe(1);
-      expect(dbClient().where.mock.calls[0][0]).toEqual({
+      expect(dbClient().del).toHaveBeenCalledTimes(1);
+      expect(dbClient().where).toHaveBeenCalledWith({
         id: server1.id,
         ownerId: servers.context.user.id,
       });
@@ -149,7 +150,7 @@ describe('ServerDataSource', () => {
         serverId: server1.id,
       });
 
-      expect(dbClient().where.mock.calls[0][0]).toEqual(
+      expect(dbClient().where).toHaveBeenCalledWith(
         expect.objectContaining({ id: server1.id })
       );
     });
@@ -166,8 +167,8 @@ describe('ServerDataSource', () => {
         serverId: server1.id,
       });
 
-      expect(dbClient().where.mock.calls[1][1]).toBe(server1.id);
-      expect(dbClient().update.mock.calls[0][1]).toBe(expected.url);
+      expect(dbClient().where).toHaveBeenNthCalledWith(2, 'id', server1.id);
+      expect(dbClient().update).toHaveBeenCalledWith('avatarUrl', expected.url);
     });
   });
 });

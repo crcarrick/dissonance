@@ -6,17 +6,13 @@ import {
   MESSAGE_ADDED_EVENT,
   MessageDataSource,
 } from '@dissonance/domains/message';
+import { messageMock } from '@dissonance/test-utils';
 
 describe('MessageDataSource', () => {
-  const [message1, message2, message3, message4] = new Array(4)
-    .fill(null)
-    .map((_, i) => ({
-      id: `${i + 1}`,
-      text: `Message ${i}`,
-      authorId: '1',
-      // use same channelId for message3 & message4 to test byChannelLoader
-      channelId: i === 3 ? `${i}` : `${i + 1}`,
-    }));
+  const message1 = messageMock();
+  const message2 = messageMock();
+  const message3 = messageMock();
+  const message4 = messageMock({ channelId: message3.channelId });
 
   let dbClient;
   let messages;
@@ -45,18 +41,21 @@ describe('MessageDataSource', () => {
         message1,
       ]);
 
-      const [expected1, expected2, expected3] = await Promise.all([
+      const expected = await Promise.all([
         messages.getByChannel(message1.channelId),
         messages.getByChannel(message2.channelId),
         messages.getByChannel(message3.channelId),
       ]);
 
-      expect(dbClient().select.mock.calls.length).toBe(1);
+      expect(dbClient().select).toHaveBeenCalledTimes(1);
 
-      expect(expected1).toContain(message1);
-      expect(expected2).toContain(message2);
-      expect(expected3).toContain(message3);
-      expect(expected3).toContain(message4);
+      expect(expected).toEqual(
+        expect.arrayContaining([
+          [message1],
+          [message2],
+          expect.arrayContaining([message3, message4]),
+        ])
+      );
     });
   });
 
@@ -70,7 +69,7 @@ describe('MessageDataSource', () => {
         text: message1.text,
       });
 
-      expect(dbClient().insert.mock.calls[0][0]).toEqual({
+      expect(dbClient().insert).toHaveBeenCalledWith({
         authorId: messages.context.user.id,
         channelId: message1.channelId,
         text: message1.text,
@@ -95,12 +94,9 @@ describe('MessageDataSource', () => {
         text: message1.text,
       });
 
-      expect(messages.context.pubsub.publish.mock.calls[0][0]).toBe(
-        MESSAGE_ADDED_EVENT
-      );
-      expect(messages.context.pubsub.publish.mock.calls[0][1]).toEqual({
-        messageAdded: message1,
-      });
+      expect(
+        messages.context.pubsub.publish
+      ).toHaveBeenCalledWith(MESSAGE_ADDED_EVENT, { messageAdded: message1 });
     });
   });
 });
