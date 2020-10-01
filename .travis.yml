@@ -4,9 +4,9 @@ node_js:
 services:
   - postgresql
 env:
-  - DATABASE_HOST = localhost
-  - DATABASE_USER = postgres
-  - DATABASE_NAME = dissonance_test
+  - DATABASE_HOST=localhost
+  - DATABASE_USER=postgres
+  - DATABASE_NAME=dissonance_test
 before_install:
   - cd server
 jobs:
@@ -16,7 +16,7 @@ jobs:
         - yarn test
 
     - name: Integration Tests
-      env: JEST_WORKERS = 2
+      env: JEST_WORKERS=2
       before_script:
         - psql -c 'CREATE DATABASE dissonance_test;' -U postgres
       script:
