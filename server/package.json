@@ -32,12 +32,13 @@
   "scripts": {
     "build": "rm -rf dist && ./node_modules/.bin/webpack --mode=production",
     "start": "pm2-runtime start ecosystem.config.js --env production",
-    "test": "jest unit --coverage && cat ./coverage/lcov.info | coveralls",
     "start:dev": "env-cmd -f ./.env.development nodemon --exec babel-node src/index.js",
     "migrate:dev": "env-cmd -f ./.env.development babel-node knex/migrate",
     "migrate:prod": "env-cmd -f ./.env.production babel-node knex/migrate",
     "test:unit": "env-cmd -f ./.env.test jest unit",
-    "test:integration": "env-cmd -f ./.env.test jest integration"
+    "test:integration": "env-cmd -f ./.env.test jest integration",
+    "test:unit:ci": "jest unit --coverage && cat ./coverage/lcov.info | coveralls",
+    "test:integration:ci": "jest integration"
   },
   "eslintConfig": {
     "extends": [

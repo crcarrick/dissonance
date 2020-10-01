@@ -9,11 +9,11 @@ jobs:
   include:
     - name: Unit Tests
       script:
-        - yarn test
+        - yarn test:unit:ci
 
     - name: Integration Tests
       env: DATABASE_HOST=localhost DATABASE_USER=postgres DATABASE_NAME=dissonance_test JEST_WORKERS=2
       before_script:
         - psql -c 'CREATE DATABASE dissonance_test;' -U postgres
       script:
-        - yarn test:integration
+        - yarn test:integration:ci
