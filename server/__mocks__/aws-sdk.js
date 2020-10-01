@@ -1,8 +1,8 @@
-const s3Mock = {
+const S3Mock = {
   getSignedUrlPromise: jest.fn(),
 };
 
 module.exports = {
-  S3: jest.fn().mockImplementation(() => s3Mock),
-  s3Mock,
+  S3: jest.fn().mockImplementation(() => S3Mock),
+  S3Mock,
 };

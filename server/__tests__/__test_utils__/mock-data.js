@@ -1,42 +1,28 @@
 import casual from 'casual';
 import { flatten, times } from 'lodash';
 
-export const userMock = ({ serverId } = {}) => {
+export const userMock = () => {
   const id = casual.uuid;
   const username = casual.username;
 
-  let user = {
+  return {
     id,
     email: `${username}@test.com`,
     password: casual.password,
     username,
     avatarUrl: `https://test.s3.amazonaws.com/${id}.png`,
   };
-
-  // Not a real column of user table, only there to test user.dataloader
-  if (serverId) {
-    user.serverId = serverId;
-  }
-
-  return user;
 };
 
-export const serverMock = ({ ownerId, userId } = {}) => {
+export const serverMock = ({ ownerId } = {}) => {
   const id = casual.uuid;
 
-  const server = {
+  return {
     id,
     name: casual.title,
     ownerId: ownerId || casual.uuid,
     avatarUrl: `https://test.s3.amazonaws.com/${id}.png`,
   };
-
-  // Not a real column of user table, only there to test server.dataloader
-  if (userId) {
-    server.userId = userId;
-  }
-
-  return server;
 };
 
 export const channelMock = ({ name, serverId } = {}) => ({

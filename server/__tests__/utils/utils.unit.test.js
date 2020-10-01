@@ -19,12 +19,12 @@ describe('Utils', () => {
       const signedUrl = 'https://www.test.com';
       const url = `https://${process.env.S3_BUCKET}.s3.amazonaws.com/${Key}`;
 
-      aws.s3Mock.getSignedUrlPromise.mockReturnValueOnce(signedUrl);
+      aws.S3Mock.getSignedUrlPromise.mockReturnValueOnce(signedUrl);
       uuidv4.mockReturnValueOnce(Key);
 
       const expected = await createSignedUrl('test.png');
 
-      expect(aws.s3Mock.getSignedUrlPromise).toHaveBeenCalledWith('putObject', {
+      expect(aws.S3Mock.getSignedUrlPromise).toHaveBeenCalledWith('putObject', {
         Bucket: process.env.S3_BUCKET,
         Key,
         Expires: 60,

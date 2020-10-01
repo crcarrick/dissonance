@@ -1,3 +1,4 @@
+import casual from 'casual';
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
@@ -8,7 +9,12 @@ describe('UserDataSource', () => {
   const user1 = userMock();
   const user2 = userMock();
   const user3 = userMock();
-  const user4 = userMock({ serverId: user3.serverId });
+  const user4 = userMock();
+
+  user1.serverId = casual.uuid;
+  user2.serverId = casual.uuid;
+  user3.serverId = casual.uuid;
+  user4.serverId = user3.serverId;
 
   let dbClient;
   let users;

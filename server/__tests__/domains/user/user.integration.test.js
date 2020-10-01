@@ -42,7 +42,7 @@ describe('User Integration', () => {
   });
 
   test('creates a signed url for avatar upload when provided an image', async () => {
-    aws.s3Mock.getSignedUrlPromise.mockReturnValueOnce('https://www.test.com');
+    aws.S3Mock.getSignedUrlPromise.mockReturnValueOnce('https://www.test.com');
     uuidv4.mockReturnValueOnce('1234');
 
     const response = await gqlClient.mutate({

@@ -1,4 +1,5 @@
 import { ForbiddenError } from 'apollo-server';
+import casual from 'casual';
 import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
@@ -7,10 +8,16 @@ import { serverMock, userMock } from '@dissonance/test-utils';
 
 describe('ServerDataSource', () => {
   const user = userMock();
+
   const server1 = serverMock({ ownerId: user.id });
   const server2 = serverMock();
   const server3 = serverMock();
-  const server4 = serverMock({ userId: server3.userId });
+  const server4 = serverMock();
+
+  server1.userId = casual.uuid;
+  server2.userId = casual.uuid;
+  server3.userId = casual.uuid;
+  server4.userId = server3.userId;
 
   let dbClient;
   let servers;
@@ -127,8 +134,8 @@ describe('ServerDataSource', () => {
   describe('Signed urls', () => {
     beforeEach(() => {
       servers.createS3SignedUrl = jest.fn((fileName) => ({
-        url: `www.test.com/${fileName}`,
-        signedUrl: 'www.test.com',
+        url: `https://www.test.com/${fileName}`,
+        signedUrl: 'https://www.test.com',
       }));
     });
 
@@ -139,8 +146,8 @@ describe('ServerDataSource', () => {
         fileName: 'test.png',
       });
 
-      expect(expected.url).toBe('www.test.com/test.png');
-      expect(expected.signedUrl).toBe('www.test.com');
+      expect(expected.url).toBe('https://www.test.com/test.png');
+      expect(expected.signedUrl).toBe('https://www.test.com');
     });
 
     test('create for the correct server', async () => {
