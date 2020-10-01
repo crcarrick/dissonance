@@ -31,7 +31,7 @@
   },
   "scripts": {
     "build": "rm -rf dist && ./node_modules/.bin/webpack --mode=production",
-    "start": "./node_modules/.bin/pm2 start dist/server.js",
+    "start": "pm2-runtime start ecosystem.config.js --env production",
     "test": "jest unit --coverage && cat ./coverage/lcov.info | coveralls",
     "start:dev": "env-cmd -f ./.env.development nodemon --exec babel-node src/index.js",
     "migrate:dev": "env-cmd -f ./.env.development babel-node knex/migrate",
