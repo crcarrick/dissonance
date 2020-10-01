@@ -29,15 +29,15 @@
     "uuid": "^8.3.0"
   },
   "scripts": {
+    "start": "nodemon --exec babel-node src/index.js",
     "start:dev": "env-cmd -f ./.env.development nodemon --exec babel-node src/index.js",
-    "start:prod": "nodemon --exec babel-node src/index.js",
     "migrate:dev": "env-cmd -f ./.env.development babel-node knex/migrate",
-    "migrate:prod": "babel-node knex/migrate",
+    "migrate:prod": "env-cmd -f ./.env.production babel-node knex/migrate",
     "seed:dev": "env-cmd -f ./.env.development babel-node knex/seed",
     "seed:test": "env-cmd -f ./.env.test babel-node knex/seed",
+    "test": "jest unit --coverage && cat ./coverage/lcov.info | coveralls",
     "test:unit": "env-cmd -f ./.env.test jest unit",
-    "test:integration": "env-cmd -f ./.env.test jest integration",
-    "test": "jest unit --coverage && cat ./coverage/lcov.info | coveralls"
+    "test:integration": "env-cmd -f ./.env.test jest integration"
   },
   "eslintConfig": {
     "extends": [

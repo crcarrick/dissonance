@@ -8,7 +8,7 @@ const processors = {
 
 module.exports = {
   development: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
       host: process.env.DATABASE_HOST,
       database: process.env.DATABASE_NAME,
@@ -29,13 +29,8 @@ module.exports = {
     ...processors,
   },
   production: {
-    client: 'postgresql',
-    connection: {
-      host: process.env.DATABASE_HOST,
-      database: process.env.DATABASE_NAME,
-      user: process.env.DATABASE_USERNAME,
-      password: process.env.DATABASE_PASSWORD,
-    },
+    client: 'pg',
+    connection: process.env.DATABASE_URL,
     pool: {
       min: 2,
       max: 10,
@@ -44,13 +39,10 @@ module.exports = {
       tableName: 'knex_migrations',
       directory: 'knex/migrations',
     },
-    seeds: {
-      directory: 'knex/seeds',
-    },
     ...processors,
   },
   test: {
-    client: 'postgresql',
+    client: 'pg',
     connection: {
       host: process.env.DATABASE_HOST,
       database: process.env.DATABASE_NAME,
