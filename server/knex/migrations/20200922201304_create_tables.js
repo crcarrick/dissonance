@@ -1,4 +1,4 @@
-export const up = async (knex) => {
+exports.up = async (knex) => {
   await knex.raw('create extension if not exists "uuid-ossp"');
 
   const uuidGenerationRaw = 'uuid_generate_v4()';
@@ -116,7 +116,7 @@ export const up = async (knex) => {
   }
 };
 
-export const down = (knex) =>
+exports.down = (knex) =>
   knex.schema
     .dropTable('users_servers')
     .dropTable('messages')

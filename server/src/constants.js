@@ -1,4 +1,4 @@
-exports.TABLE_NAMES = {
+export const TABLE_NAMES = {
   CHANNELS: 'channels',
   MESSAGES: 'messages',
   SERVERS: 'servers',

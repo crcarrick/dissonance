@@ -1,15 +1,11 @@
 import knex from 'knex';
 
-import { TABLE_NAMES } from '@dissonance/constants';
 import { AuthDataSource } from '@dissonance/domains/auth';
+import { TABLE_NAMES } from '@dissonance/constants';
+import { userMock } from '@dissonance/test-utils';
 
 describe('AuthDataSource', () => {
-  const user = {
-    id: '1',
-    email: 'user1@test.com',
-    username: 'user1',
-    password: 'user1',
-  };
+  const user = userMock();
 
   let dbClient;
   let auth;
@@ -68,7 +64,7 @@ describe('AuthDataSource', () => {
     test('throws the correct error with incorrect password', async () => {
       auth.context.dataSources.users.byEmailLoader.load.mockReturnValueOnce({
         email: user.email,
-        password: 'user2',
+        password: 'incorrectpassword',
       });
 
       await expect(
@@ -83,7 +79,7 @@ describe('AuthDataSource', () => {
 
       const expected = await auth.signup(user);
 
-      expect(dbClient().insert.mock.calls[0][0]).toEqual({
+      expect(dbClient().insert).toHaveBeenCalledWith({
         email: user.email,
         password: user.password,
         username: user.username,
@@ -96,7 +92,7 @@ describe('AuthDataSource', () => {
 
       const expected = await auth.signup(user);
 
-      expect(dbClient().insert.mock.calls[0][0]).toEqual({
+      expect(dbClient().insert).toHaveBeenCalledWith({
         email: user.email,
         password: user.password,
         username: user.username,
@@ -106,13 +102,10 @@ describe('AuthDataSource', () => {
     });
 
     test('throws the correct errors with existing email', async () => {
-      dbClient().returning.mockImplementationOnce(() => {
-        const error = new Error();
+      const error = new Error();
+      error.constraint = 'users_email_unique';
 
-        error.constraint = 'users_email_unique';
-
-        throw error;
-      });
+      dbClient().returning.mockRejectedValueOnce(error);
 
       await expect(auth.signup(user)).rejects.toThrow(
         'Email is already in use'
@@ -120,13 +113,10 @@ describe('AuthDataSource', () => {
     });
 
     test('throws the correct errors with existing username', async () => {
-      dbClient().returning.mockImplementationOnce(() => {
-        const error = new Error();
+      const error = new Error();
+      error.constraint = 'users_username_unique';
 
-        error.constraint = 'users_username_unique';
-
-        throw error;
-      });
+      dbClient().returning.mockRejectedValueOnce(error);
 
       await expect(auth.signup(user)).rejects.toThrow(
         'Username is already in use'

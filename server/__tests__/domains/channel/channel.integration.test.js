@@ -4,35 +4,29 @@ import { createDbClient } from '@dissonance/database';
 
 import {
   createTestClient,
-  generateData,
-  migrate,
-  rollback,
+  generateMockData,
   seedDatabase,
 } from '@dissonance/test-utils';
 
 const knex = jest.requireActual('knex');
 
 describe('Channel Integration', () => {
-  const mockData = generateData();
-  const { users, channels, servers } = mockData;
+  const { users, channels, servers } = generateMockData();
 
-  // All Hooks
   let dbClient;
-  beforeAll((done) => {
-    dbClient = createDbClient(knex);
-
-    migrate(dbClient).then(() => done());
+  beforeAll(() => {
+    dbClient = createDbClient(
+      knex,
+      `dissonance_test_${process.env.JEST_WORKER_ID}`
+    );
   });
 
-  afterAll((done) => {
-    rollback()
-      .then(() => dbClient.destroy())
-      .then(() => done());
+  afterAll(async () => {
+    await dbClient.destroy();
   });
 
-  // Each Hooks
   let gqlClient;
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     await seedDatabase(dbClient);
 
     gqlClient = createTestClient({
@@ -41,8 +35,6 @@ describe('Channel Integration', () => {
       },
       dbClient,
     });
-
-    done();
   });
 
   test('gets a channel', async () => {

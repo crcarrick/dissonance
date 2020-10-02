@@ -32,15 +32,6 @@ export const typeDefs = gql`
     id: ID!
   }
 
-  input UpdateServerInputFields {
-    name: String!
-  }
-
-  input UpdateServerInput {
-    id: ID!
-    fields: UpdateServerInputFields!
-  }
-
   # Server Queries
   extend type Query {
     server(input: GetServerInput!): Server!
@@ -54,6 +45,5 @@ export const typeDefs = gql`
     ): SignedUrlPayload! @authenticated
     createServer(input: CreateServerInput!): Server! @authenticated
     deleteServer(input: DeleteServerInput!): DeleteServerPayload! @authenticated
-    updateServer(input: UpdateServerInput!): Server! @authenticated
   }
 `;

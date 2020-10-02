@@ -3,7 +3,7 @@ import { MESSAGE_ADDED_EVENT, resolvers } from '@dissonance/domains/message';
 describe('Message Resolvers', () => {
   describe('Mutation', () => {
     test('createMessage', () => {
-      const input = { channelId: '1', text: 'Test Message' };
+      const input = { channelId: '1', text: 'Testing 123' };
       const dataSources = {
         messages: {
           create: jest.fn(),
@@ -12,7 +12,7 @@ describe('Message Resolvers', () => {
 
       resolvers.Mutation.createMessage(null, { input }, { dataSources });
 
-      expect(dataSources.messages.create.mock.calls[0][0]).toEqual(input);
+      expect(dataSources.messages.create).toHaveBeenCalledWith(input);
     });
   });
 
@@ -24,7 +24,7 @@ describe('Message Resolvers', () => {
 
       resolvers.Subscription.messageAdded.subscribe(null, null, { pubsub });
 
-      expect(pubsub.asyncIterator.mock.calls[0][0]).toBe(MESSAGE_ADDED_EVENT);
+      expect(pubsub.asyncIterator).toHaveBeenCalledWith(MESSAGE_ADDED_EVENT);
     });
   });
 
@@ -39,7 +39,7 @@ describe('Message Resolvers', () => {
 
       resolvers.Message.author(message, null, { dataSources });
 
-      expect(dataSources.users.getById.mock.calls[0][0]).toBe(message.authorId);
+      expect(dataSources.users.getById).toHaveBeenCalledWith(message.authorId);
     });
 
     test('channel', () => {
@@ -52,7 +52,7 @@ describe('Message Resolvers', () => {
 
       resolvers.Message.channel(message, null, { dataSources });
 
-      expect(dataSources.channels.getById.mock.calls[0][0]).toBe(
+      expect(dataSources.channels.getById).toHaveBeenCalledWith(
         message.channelId
       );
     });

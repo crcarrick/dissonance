@@ -12,7 +12,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Query.server(null, { input }, { dataSources });
 
-      expect(dataSources.servers.getById.mock.calls[0][0]).toBe(input.id);
+      expect(dataSources.servers.getById).toHaveBeenCalledWith(input.id);
     });
 
     test('servers', () => {
@@ -24,7 +24,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Query.servers(null, null, { dataSources });
 
-      expect(dataSources.servers.get.mock.calls.length).toBe(1);
+      expect(dataSources.servers.get).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -43,9 +43,7 @@ describe('Server Resolvers', () => {
         { dataSources }
       );
 
-      expect(dataSources.servers.createSignedUrl.mock.calls[0][0]).toEqual(
-        input
-      );
+      expect(dataSources.servers.createSignedUrl).toHaveBeenCalledWith(input);
     });
 
     test('createServer', () => {
@@ -58,7 +56,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Mutation.createServer(null, { input }, { dataSources });
 
-      expect(dataSources.servers.create.mock.calls[0][0]).toEqual(input);
+      expect(dataSources.servers.create).toHaveBeenCalledWith(input);
     });
 
     test('deleteServer', () => {
@@ -71,20 +69,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Mutation.deleteServer(null, { input }, { dataSources });
 
-      expect(dataSources.servers.delete.mock.calls[0][0]).toEqual(input.id);
-    });
-
-    test('updateServer', () => {
-      const input = { id: '1', fields: { name: 'Test Server 2' } };
-      const dataSources = {
-        servers: {
-          update: jest.fn(),
-        },
-      };
-
-      resolvers.Mutation.updateServer(null, { input }, { dataSources });
-
-      expect(dataSources.servers.update.mock.calls[0][0]).toEqual(input);
+      expect(dataSources.servers.delete).toHaveBeenCalledWith(input.id);
     });
   });
 
@@ -99,7 +84,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Server.channels(server, null, { dataSources });
 
-      expect(dataSources.channels.getByServer.mock.calls[0][0]).toBe(server.id);
+      expect(dataSources.channels.getByServer).toHaveBeenCalledWith(server.id);
     });
 
     test('owner', () => {
@@ -112,7 +97,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Server.owner(server, null, { dataSources });
 
-      expect(dataSources.users.getById.mock.calls[0][0]).toBe(server.ownerId);
+      expect(dataSources.users.getById).toHaveBeenCalledWith(server.ownerId);
     });
 
     test('users', () => {
@@ -125,7 +110,7 @@ describe('Server Resolvers', () => {
 
       resolvers.Server.users(server, null, { dataSources });
 
-      expect(dataSources.users.getByServer.mock.calls[0][0]).toBe(server.id);
+      expect(dataSources.users.getByServer).toHaveBeenCalledWith(server.id);
     });
   });
 });

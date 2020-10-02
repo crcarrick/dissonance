@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+  - 14.9.0
+services:
+  - postgresql
+before_install:
+  - cd server
+jobs:
+  include:
+    - name: Unit Tests
+      script:
+        - yarn test:unit:ci
+
+    - name: Integration Tests
+      env: DATABASE_HOST=localhost DATABASE_USER=postgres DATABASE_NAME=dissonance_test S3_BUCKET=dissonance JEST_WORKERS=6
+      before_script:
+        - psql -c 'CREATE DATABASE dissonance_test;' -U postgres
+      script:
+        - yarn test:integration:ci

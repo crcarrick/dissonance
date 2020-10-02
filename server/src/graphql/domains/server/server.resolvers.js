@@ -18,11 +18,6 @@ export const resolvers = {
       servers.create({ name }),
     deleteServer: (_, { input: { id } }, { dataSources: { servers } }) =>
       servers.delete(id),
-    updateServer: (
-      _,
-      { input: { id, fields } },
-      { dataSources: { servers } }
-    ) => servers.update({ id, fields }),
   },
   Server: {
     channels: (server, _, { dataSources: { channels } }) =>

@@ -13,7 +13,7 @@ const getMockFns = () => ({
   whereIn: jest.fn().mockReturnThis(),
 });
 
-module.exports = () => {
+export default () => {
   let mock;
 
   const mockKnexFn = jest.fn(() => {

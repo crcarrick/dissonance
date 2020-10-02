@@ -1,4 +1,2 @@
-module.exports = {
-  v1: jest.fn(),
-  v4: jest.fn(),
-};
+export const v1 = jest.fn();
+export const v4 = jest.fn();

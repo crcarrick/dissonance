@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Integration joins a server 1`] = `
+Object {
+  "serverId": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+  "userId": "55e1229a-03a5-4952-a3d7-b44eb2a3bb85",
+}
+`;

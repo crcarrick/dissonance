@@ -3,6 +3,7 @@ import knex from 'knex';
 
 import { TABLE_NAMES } from '@dissonance/constants';
 import { UserServerDataSource } from '@dissonance/domains/userServer';
+import { userMock, userServerMock } from '@dissonance/test-utils';
 
 describe('UserServer', () => {
   let dbClient;
@@ -14,26 +15,20 @@ describe('UserServer', () => {
     usersServers.initialize({
       cache: {},
       context: {
-        user: {
-          id: '1',
-        },
+        user: userMock(),
       },
     });
   });
 
   test('joins a server', async () => {
-    dbClient().returning.mockReturnValueOnce([{ serverId: '1', userId: '1' }]);
+    const userServer = userServerMock({ userId: usersServers.context.user.id });
 
-    const response = await usersServers.joinServer('1');
+    dbClient().returning.mockReturnValueOnce([userServer]);
 
-    expect(dbClient().insert).toHaveBeenCalledWith({
-      serverId: '1',
-      userId: '1',
-    });
-    expect(response).toEqual({
-      serverId: '1',
-      userId: '1',
-    });
+    const response = await usersServers.joinServer(userServer.serverId);
+
+    expect(dbClient().insert).toHaveBeenCalledWith(userServer);
+    expect(response).toEqual(userServer);
   });
 
   test('throws when no user is present on the context', async () => {

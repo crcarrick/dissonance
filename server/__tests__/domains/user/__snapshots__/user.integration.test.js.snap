@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`User Integration creates a signed url for avatar upload when provided an image 1`] = `
+Object {
+  "signedUrl": "https://www.test.com/",
+  "url": "https://dissonance.s3.amazonaws.com/1234",
+}
+`;
+
+exports[`User Integration does not create a signed url for avatar upload when provided a non-image 1`] = `
+Array [
+  [GraphQLError: File is not an image type],
+]
+`;
