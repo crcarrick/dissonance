@@ -33,6 +33,18 @@ const baseTypeDefs = gql`
   }
 `;
 
+const createDataSources = (dbClient) => ({
+  auth: new auth.AuthDataSource(dbClient, TABLE_NAMES.USERS),
+  channels: new channel.ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS),
+  messages: new message.MessageDataSource(dbClient, TABLE_NAMES.MESSAGES),
+  servers: new server.ServerDataSource(dbClient, TABLE_NAMES.SERVERS),
+  users: new user.UserDataSource(dbClient, TABLE_NAMES.USERS),
+  usersServers: new userServer.UserServerDataSource(
+    dbClient,
+    TABLE_NAMES.USERS_SERVERS
+  ),
+});
+
 export const createGQLConfig = ({ context, dbClient }) => ({
   typeDefs: [
     ...graphqlScalarTypeDefs,
@@ -64,7 +76,7 @@ export const createGQLConfig = ({ context, dbClient }) => ({
           dbClient,
         });
 
-        return { user: authUser };
+        return { authUser, dataSources: createDataSources(dbClient), pubsub };
       }
 
       throw new AuthenticationError('Not authenticated');
@@ -73,32 +85,33 @@ export const createGQLConfig = ({ context, dbClient }) => ({
   context: context
     ? context
     : async ({ req, connection }) => {
-        let authUser;
         if (connection) {
-          authUser = connection.context.user;
-        } else {
-          authUser = await findAuthUser({
-            authorization: req.headers.authorization,
-            dbClient,
-          });
+          const subscriptionContext = connection.context;
+          const { dataSources } = subscriptionContext;
+
+          for (const instance in dataSources) {
+            dataSources[instance].initialize({
+              context: connection.context,
+              cache: null,
+            });
+          }
+
+          return {
+            ...subscriptionContext,
+          };
         }
+
+        const authUser = await findAuthUser({
+          authorization: req.headers.authorization,
+          dbClient,
+        });
 
         return {
           pubsub,
           user: authUser,
         };
       },
-  dataSources: () => ({
-    auth: new auth.AuthDataSource(dbClient, TABLE_NAMES.USERS),
-    channels: new channel.ChannelDataSource(dbClient, TABLE_NAMES.CHANNELS),
-    messages: new message.MessageDataSource(dbClient, TABLE_NAMES.MESSAGES),
-    servers: new server.ServerDataSource(dbClient, TABLE_NAMES.SERVERS),
-    users: new user.UserDataSource(dbClient, TABLE_NAMES.USERS),
-    usersServers: new userServer.UserServerDataSource(
-      dbClient,
-      TABLE_NAMES.USERS_SERVERS
-    ),
-  }),
+  dataSources: () => createDataSources(dbClient),
   schemaDirectives: {
     authenticated: AuthenticationDirective,
   },

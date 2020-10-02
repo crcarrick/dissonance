@@ -23,7 +23,7 @@ import {
 export const Channel = () => {
   const scrollbarRef = useRef();
 
-  const { channel, handleChange, handleSubmit, message } = useChannel(
+  const { channel, messages, handleChange, handleSubmit, message } = useChannel(
     scrollbarRef
   );
 
@@ -41,7 +41,7 @@ export const Channel = () => {
         ref={scrollbarRef}
       >
         <ChannelMessages>
-          {channel?.messages.map(({ id, author, text, createdAt }) => (
+          {messages?.map(({ id, author, text, createdAt }) => (
             <ChannelMessage key={id}>
               <ChannelMessageAvatar />
               <ChannelMessageContent style={{ marginLeft: 16 }}>

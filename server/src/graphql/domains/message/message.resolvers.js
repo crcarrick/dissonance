@@ -3,6 +3,10 @@ import { withFilter } from 'apollo-server';
 import { MESSAGE_ADDED_EVENT } from './message.events';
 
 export const resolvers = {
+  Query: {
+    messages: (_, { input: { channelId } }, { dataSources: { messages } }) =>
+      messages.getByChannel(channelId),
+  },
   Mutation: {
     createMessage: (
       _,

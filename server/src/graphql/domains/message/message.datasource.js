@@ -16,6 +16,7 @@ export class MessageDataSource extends SQLDataSource {
     this.byChannelLoader = new DataLoader((ids) =>
       this.db(this.table)
         .whereIn('channelId', ids)
+        .orderBy('createdAt', 'asc')
         .select()
         .then(mapToMany(ids, (message) => message.channelId))
     );
@@ -23,6 +24,12 @@ export class MessageDataSource extends SQLDataSource {
 
   async getByChannel(channelId) {
     try {
+      const authorized = this.userBelongsToChannel(channelId);
+
+      if (!authorized) {
+        throw new ForbiddenError();
+      }
+
       const channel = await this.byChannelLoader.load(channelId);
 
       return channel;
@@ -35,18 +42,9 @@ export class MessageDataSource extends SQLDataSource {
     try {
       const { pubsub, user } = this.context;
 
-      const authorized = await this.db(TABLE_NAMES.CHANNELS)
-        .whereIn(
-          'serverId',
-          this.db(TABLE_NAMES.USERS_SERVERS)
-            .select('serverId')
-            .where('userId', user.id)
-        )
-        .andWhere('id', channelId)
-        .select()
-        .first();
+      const authorized = this.userBelongsToChannel(channelId);
 
-      if (!Boolean(authorized)) {
+      if (!authorized) {
         throw new ForbiddenError();
       }
 
@@ -55,15 +53,29 @@ export class MessageDataSource extends SQLDataSource {
         .returning(this.columns);
 
       pubsub.publish(MESSAGE_ADDED_EVENT, {
-        messageAdded: {
-          author: user,
-          ...message,
-        },
+        messageAdded: message,
       });
 
       return message;
     } catch (error) {
       this.didEncounterError(error);
     }
+  }
+
+  async userBelongsToChannel(channelId) {
+    const { user } = this.context;
+
+    const authorized = await this.db(TABLE_NAMES.CHANNELS)
+      .whereIn(
+        'serverId',
+        this.db(TABLE_NAMES.USERS_SERVERS)
+          .select('serverId')
+          .where('userId', user.id)
+      )
+      .andWhere('id', channelId)
+      .select()
+      .first();
+
+    return Boolean(authorized);
   }
 }

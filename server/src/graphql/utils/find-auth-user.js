@@ -16,7 +16,14 @@ export const findAuthUser = async ({ authorization, dbClient }) => {
     const authUser = decodedToken?.id
       ? await dbClient(TABLE_NAMES.USERS)
           .where('id', decodedToken.id)
-          .select()
+          .select([
+            'id',
+            'email',
+            'username',
+            'createdAt',
+            'updatedAt',
+            'avatarUrl',
+          ])
           .first()
       : null;
 

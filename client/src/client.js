@@ -37,7 +37,9 @@ const authLink = setContext(({ operationName }, { headers }) => {
   return {
     headers: {
       ...headers,
-      Authorization: token ? `Bearer ${token}` : '',
+      Authorization: token
+        ? `Bearer ${localStorage.getItem(process.env.REACT_APP_AUTH_TOKEN)}`
+        : '',
     },
   };
 });
