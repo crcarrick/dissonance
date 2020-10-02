@@ -3,7 +3,7 @@ import { MESSAGE_ADDED_EVENT, resolvers } from '@dissonance/domains/message';
 describe('Message Resolvers', () => {
   describe('Mutation', () => {
     test('createMessage', () => {
-      const input = { channelId: '1', text: 'Test Message' };
+      const input = { channelId: '1', text: 'Testing 123' };
       const dataSources = {
         messages: {
           create: jest.fn(),

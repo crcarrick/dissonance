@@ -21,12 +21,12 @@ describe('Channel Integration', () => {
     );
   });
 
-  afterAll((done) => {
-    dbClient.destroy().then(() => done());
+  afterAll(async () => {
+    await dbClient.destroy();
   });
 
   let gqlClient;
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     await seedDatabase(dbClient);
 
     gqlClient = createTestClient({
@@ -35,8 +35,6 @@ describe('Channel Integration', () => {
       },
       dbClient,
     });
-
-    done();
   });
 
   test('gets a channel', async () => {

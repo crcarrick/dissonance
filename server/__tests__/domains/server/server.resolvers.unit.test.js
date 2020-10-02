@@ -71,19 +71,6 @@ describe('Server Resolvers', () => {
 
       expect(dataSources.servers.delete).toHaveBeenCalledWith(input.id);
     });
-
-    test('updateServer', () => {
-      const input = { id: '1', fields: { name: 'Test Server 2' } };
-      const dataSources = {
-        servers: {
-          update: jest.fn(),
-        },
-      };
-
-      resolvers.Mutation.updateServer(null, { input }, { dataSources });
-
-      expect(dataSources.servers.update).toHaveBeenCalledWith(input);
-    });
   });
 
   describe('Server', () => {

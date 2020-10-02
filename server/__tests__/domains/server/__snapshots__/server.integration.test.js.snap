@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Server Integration creates a server 1`] = `
+Object {
+  "id": Any<String>,
+  "name": "Testing 123",
+}
+`;
+
+exports[`Server Integration creates a signed url for avatar upload when provided an image 1`] = `
+Object {
+  "signedUrl": "https://www.test.com/",
+  "url": "https://dissonance.s3.amazonaws.com/1234",
+}
+`;
+
+exports[`Server Integration deletes a server if authorized 1`] = `
+Object {
+  "id": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+}
+`;
+
+exports[`Server Integration does not create a signed url for avatar upload when provided a non-image 1`] = `
+Array [
+  [GraphQLError: File is not an image type],
+]
+`;
+
+exports[`Server Integration does not delete a server if unauthorized 1`] = `
+Array [
+  [GraphQLError],
+]
+`;
+
+exports[`Server Integration gets a server 1`] = `
+Object {
+  "id": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+  "name": "Inventore provident est",
+}
+`;
+
+exports[`Server Integration gets all servers 1`] = `
+Array [
+  Object {
+    "id": "029beee1-5599-4c4b-880d-c238b3ab3d16",
+    "name": "Inventore provident est",
+  },
+  Object {
+    "id": "1267b1ac-3833-420f-b8a4-a4f25dbbc73f",
+    "name": "Impedit facere harum",
+  },
+  Object {
+    "id": "df5bb0e8-1143-459f-8fa2-cf5034a55764",
+    "name": "Non quos possimus",
+  },
+]
+`;
