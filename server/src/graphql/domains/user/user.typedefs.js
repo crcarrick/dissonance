@@ -7,7 +7,7 @@ export const typeDefs = gql`
     email: String!
     password: String!
     username: String!
-    avatarUrl: String!
+    avatarUrl: URL
     servers: [Server]!
   }
 

@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { Divider } from '@material-ui/core';
-
 import {
   ChannelListChannel,
   ChannelListChannels,
+  ChannelListChannelName,
+  ChannelListChannelPoundSign,
   ChannelListChannelText,
   ChannelListContainer,
-  ChannelListServerName,
+  ChannelListTopBar,
 } from './ChannelList.style';
 import { useChannelList } from './ChannelList.hooks';
 
@@ -16,12 +16,14 @@ export const ChannelList = () => {
 
   return (
     <ChannelListContainer>
-      <ChannelListServerName>{server.name}</ChannelListServerName>
-      <Divider />
+      <ChannelListTopBar>{server.name}</ChannelListTopBar>
       <ChannelListChannels component="nav">
         {server.channels.map((channel) => (
           <ChannelListChannel {...getChannelProps(channel)}>
-            <ChannelListChannelText>#{channel.name}</ChannelListChannelText>
+            <ChannelListChannelText>
+              <ChannelListChannelPoundSign />
+              <ChannelListChannelName>{channel.name}</ChannelListChannelName>
+            </ChannelListChannelText>
           </ChannelListChannel>
         ))}
       </ChannelListChannels>

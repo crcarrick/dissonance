@@ -6,6 +6,7 @@ import { TABLE_NAMES } from '@dissonance/constants';
 export const findAuthUser = async ({ authorization, dbClient }) => {
   try {
     let decodedToken;
+
     if (authorization) {
       const token = authorization.replace('Bearer', '').trim();
 

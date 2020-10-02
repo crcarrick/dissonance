@@ -6,6 +6,7 @@ export const typeDefs = gql`
     id: ID!
     name: String!
     owner: AuthUser!
+    avatarUrl: URL
     channels: [Channel]!
     users: [AuthUser]!
   }

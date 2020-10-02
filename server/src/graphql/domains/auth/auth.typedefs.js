@@ -6,7 +6,7 @@ export const typeDefs = gql`
     id: ID!
     email: String!
     username: String!
-    avatarUrl: String!
+    avatarUrl: URL
     servers: [Server]!
   }
 

@@ -13,6 +13,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.20.0",
+    "date-fns": "^2.16.1",
     "emotion-theming": "^10.0.27",
     "formik": "^2.1.5",
     "graphql": "^15.3.0",

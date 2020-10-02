@@ -24,7 +24,7 @@ export const useAuth = ({ initialValues, mutation }) => {
 
       localStorage.setItem(
         process.env.REACT_APP_AUTH_TOKEN,
-        (data.loginUser || data.signupUser).token
+        (data.login || data.signup).token
       );
 
       await getMe();

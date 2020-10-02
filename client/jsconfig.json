@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@dissonance/assets": ["src/assets/"],
+      "@dissonance/client": ["src/client.js"],
+      "@dissonance/components": ["src/components/"],
+      "@dissonance/data": ["src/data/"],
+      "@dissonance/hooks": ["src/hooks/"]
+    }
+  },
+  "typeAcquisition": {
+    "include": ["jest"]
+  }
+}
