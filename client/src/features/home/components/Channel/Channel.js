@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 
 import { formatRelative } from 'date-fns';
 import { upperFirst } from 'lodash';
@@ -21,7 +21,11 @@ import {
 } from './Channel.style';
 
 export const Channel = () => {
-  const { channel, handleChange, handleSubmit, message } = useChannel();
+  const scrollbarRef = useRef();
+
+  const { channel, handleChange, handleSubmit, message } = useChannel(
+    scrollbarRef
+  );
 
   return (
     <ChannelContainer>
@@ -34,6 +38,7 @@ export const Channel = () => {
         autoHide={true}
         autoHideTimeout={500}
         style={{ flex: 1 }}
+        ref={scrollbarRef}
       >
         <ChannelMessages>
           {channel?.messages.map(({ id, author, text, createdAt }) => (

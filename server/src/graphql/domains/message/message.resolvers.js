@@ -14,8 +14,8 @@ export const resolvers = {
     messageAdded: {
       subscribe: withFilter(
         (_, __, { pubsub }) => pubsub.asyncIterator(MESSAGE_ADDED_EVENT),
-        ({ messageAdded: { channel } }, { input: { channelId } }) =>
-          channel === channelId
+        ({ messageAdded }, { input: { channelId } }) =>
+          messageAdded.channelId === channelId
       ),
     },
   },

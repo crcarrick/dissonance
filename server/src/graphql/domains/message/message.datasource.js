@@ -55,7 +55,10 @@ export class MessageDataSource extends SQLDataSource {
         .returning(this.columns);
 
       pubsub.publish(MESSAGE_ADDED_EVENT, {
-        messageAdded: message,
+        messageAdded: {
+          author: user,
+          ...message,
+        },
       });
 
       return message;

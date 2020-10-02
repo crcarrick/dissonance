@@ -58,9 +58,9 @@ export const createGQLConfig = ({ context, dbClient }) => ({
   ],
   subscriptions: {
     onConnect: async (connectionParams) => {
-      if (connectionParams.Authorization) {
+      if (connectionParams.authorization) {
         const authUser = await findAuthUser({
-          authorization: connectionParams.Authorization,
+          authorization: connectionParams.authorization,
           dbClient,
         });
 

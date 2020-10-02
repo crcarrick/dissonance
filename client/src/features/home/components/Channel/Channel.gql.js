@@ -34,3 +34,18 @@ export const GET_CHANNEL = gql`
     }
   }
 `;
+
+export const MESSAGE_ADDED = gql`
+  subscription MessageAdded($input: MessageAddedInput!) {
+    messageAdded(input: $input) {
+      id
+      text
+      createdAt
+      updatedAt
+      author {
+        id
+        username
+      }
+    }
+  }
+`;
