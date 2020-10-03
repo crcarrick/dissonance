@@ -6,7 +6,10 @@ import {
   Observable,
   split,
 } from '@apollo/client';
-import { getMainDefinition } from '@apollo/client/utilities';
+import {
+  getMainDefinition,
+  relayStylePagination,
+} from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
 import { WebSocketLink } from '@apollo/client/link/ws';
 
@@ -77,5 +80,13 @@ const link = split(
 
 export const client = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    // typePolicies: {
+    //   Query: {
+    //     fields: {
+    //       messageFeed: relayStylePagination(),
+    //     },
+    //   },
+    // },
+  }),
 });

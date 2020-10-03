@@ -68,6 +68,7 @@ export const ChannelInput = styled.input`
   border: none;
   color: rgb(220, 221, 222);
   font-size: 16px;
+  flex: 1;
 
   &::placeholder {
     color: #72767d;

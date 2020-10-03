@@ -1,14 +1,14 @@
 import { gql } from '@apollo/client';
 
 export const READ_CHANNEL = gql`
-  fragment CurrentChannel on Channel {
+  fragment CurrentChannelListChannel on Channel {
     id
     name
   }
 `;
 
 export const READ_SERVER = gql`
-  fragment CurrentServer on Server {
+  fragment CurrentChannelListServer on Server {
     id
     name
     channels {

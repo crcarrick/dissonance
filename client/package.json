@@ -28,6 +28,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-transition-group": "^4.4.1",
+    "react-waypoint": "^9.0.3",
     "subscriptions-transport-ws": "^0.9.18",
     "yup": "^0.29.3"
   },

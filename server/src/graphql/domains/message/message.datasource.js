@@ -38,6 +38,49 @@ export class MessageDataSource extends SQLDataSource {
     }
   }
 
+  async getMessageFeed({ before, first, channelId }) {
+    try {
+      const authorized = this.userBelongsToChannel(channelId);
+
+      if (!authorized) {
+        throw new ForbiddenError();
+      }
+
+      let query = this.db(this.table).where('channelId', channelId);
+
+      if (before) {
+        query = query.whereRaw(
+          '(created_at, id) < (?, ?)',
+          this.decodeCursor(before)
+        );
+      }
+
+      const messages = await query
+        .orderBy('createdAt', 'desc')
+        .limit(first)
+        .select();
+
+      const start = messages[0];
+      const end = messages[messages.length - 1];
+
+      return {
+        edges: messages.map((message) => ({
+          cursor: this.createCursor(message),
+          node: message,
+        })),
+        pageInfo: {
+          startCursor: this.createCursor(start),
+          endCursor: this.createCursor(end),
+          // TODO
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
+    } catch (error) {
+      this.didEncounterError(error);
+    }
+  }
+
   async create({ channelId, text }) {
     try {
       const { pubsub, user } = this.context;
@@ -53,7 +96,10 @@ export class MessageDataSource extends SQLDataSource {
         .returning(this.columns);
 
       pubsub.publish(MESSAGE_ADDED_EVENT, {
-        messageAdded: message,
+        messageAdded: {
+          cursor: this.createCursor(message),
+          node: message,
+        },
       });
 
       return message;
@@ -77,5 +123,23 @@ export class MessageDataSource extends SQLDataSource {
       .first();
 
     return Boolean(authorized);
+  }
+
+  createCursor(message) {
+    if (message) {
+      const cursor = `${message.createdAt.getTime()},${message.id}`;
+      const buffer = Buffer.from(cursor);
+
+      return buffer.toString('base64');
+    }
+
+    return '';
+  }
+
+  decodeCursor(cursor) {
+    const buffer = Buffer.from(cursor, 'base64');
+    const [createdAt, id] = buffer.toString('ascii').split(',');
+
+    return [new Date(parseInt(createdAt, 10)), id];
   }
 }

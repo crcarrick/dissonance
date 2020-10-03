@@ -37,8 +37,6 @@ const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
     },
   });
 
-let i = 0;
-
 export const useGetMessages = ({ input }) => {
   const { data, loading, error, subscribeToMore } = useQuery(GET_MESSAGES, {
     variables: {
@@ -62,22 +60,8 @@ export const useGetMessages = ({ input }) => {
   };
 };
 
-export const useLazyGetMessages = ({ input }) => {
-  const [getMessages, { subscribeToMore }] = useLazyQuery(GET_MESSAGES, {
-    variables: {
-      input,
-    },
-  });
+export const useLazyGetMessages = () => {
+  const [getMessages] = useLazyQuery(GET_MESSAGES);
 
-  return [
-    getMessages,
-    useCallback(
-      () =>
-        wrappedSubscribeToMore({
-          channelId: input.channelId,
-          subscribeToMore,
-        }),
-      [input.channelId, subscribeToMore]
-    ),
-  ];
+  return ({ input }) => getMessages({ variables: { input } });
 };

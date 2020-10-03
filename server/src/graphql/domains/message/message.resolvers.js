@@ -6,6 +6,11 @@ export const resolvers = {
   Query: {
     messages: (_, { input: { channelId } }, { dataSources: { messages } }) =>
       messages.getByChannel(channelId),
+    messageFeed: (
+      _,
+      { input: { before, first, channelId } },
+      { dataSources: { messages } }
+    ) => messages.getMessageFeed({ before, first, channelId }),
   },
   Mutation: {
     createMessage: (

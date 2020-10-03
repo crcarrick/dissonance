@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { formatRelative } from 'date-fns';
 import { upperFirst } from 'lodash';
 import { Scrollbars } from 'react-custom-scrollbars';
+import { Waypoint } from 'react-waypoint';
 
 import { useChannel } from './Channel.hooks';
 import {
@@ -23,9 +24,15 @@ import {
 export const Channel = () => {
   const scrollbarRef = useRef();
 
-  const { channel, messages, handleChange, handleSubmit, message } = useChannel(
-    scrollbarRef
-  );
+  const {
+    loading,
+    channel,
+    messages,
+    fetchMore,
+    handleChange,
+    handleSubmit,
+    message,
+  } = useChannel(scrollbarRef);
 
   return (
     <ChannelContainer>
@@ -41,9 +48,10 @@ export const Channel = () => {
         ref={scrollbarRef}
       >
         <ChannelMessages>
+          <Waypoint onEnter={() => fetchMore()} />
           {messages?.map(({ id, author, text, createdAt }) => (
             <ChannelMessage key={id}>
-              <ChannelMessageAvatar />
+              <ChannelMessageAvatar src={author.avatarUrl} />
               <ChannelMessageContent style={{ marginLeft: 16 }}>
                 <ChannelMessageUsername>
                   {author.username}

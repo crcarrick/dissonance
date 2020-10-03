@@ -1,19 +1,17 @@
 import { gql, useSubscription } from '@apollo/client';
 
+import { MESSAGE_FIELDS } from './MessageFields.gql';
+
 export const MESSAGE_ADDED = gql`
   subscription OnMessageAdded($input: MessageAddedInput!) {
     messageAdded(input: $input) {
-      id
-      text
-      createdAt
-      updatedAt
-      author {
-        id
-        username
-        avatarUrl
+      cursor
+      node {
+        ...MessageFields
       }
     }
   }
+  ${MESSAGE_FIELDS}
 `;
 
 export const useMessageAdded = ({ input }) => {

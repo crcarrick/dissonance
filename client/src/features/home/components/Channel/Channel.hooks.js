@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { gql } from '@apollo/client';
 
 import { client } from '@dissonance/client';
-import { useCreateMessage, useGetMessages } from '@dissonance/data';
+import { useCreateMessage, useGetMessageFeed } from '@dissonance/data';
 import { useRouter } from '@dissonance/hooks';
 
 export const useChannel = (scrollbarRef) => {
@@ -19,12 +19,12 @@ export const useChannel = (scrollbarRef) => {
     id: `Channel:${match.params.channelId}`,
   });
 
-  const { data, loading, subscribeToMore } = useGetMessages({
+  const { data, loading, fetchMore, subscribeToMore } = useGetMessageFeed({
     input: { channelId: match.params.channelId },
   });
   const createMessage = useCreateMessage();
 
-  const messages = data?.messages?.length;
+  const messages = data?.messageFeed?.edges.length;
 
   useEffect(() => {
     const unsubscribe = subscribeToMore();
@@ -52,7 +52,8 @@ export const useChannel = (scrollbarRef) => {
 
   return {
     channel,
-    messages: data?.messages,
+    messages: data?.messageFeed?.edges.map((edge) => edge.node).reverse(),
+    fetchMore,
     handleChange,
     handleSubmit,
     loading,
