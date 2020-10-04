@@ -5,10 +5,7 @@ import { MESSAGE_FIELDS } from './MessageFields.gql';
 export const MESSAGE_ADDED = gql`
   subscription OnMessageAdded($input: MessageAddedInput!) {
     messageAdded(input: $input) {
-      cursor
-      node {
-        ...MessageFields
-      }
+      ...MessageFields
     }
   }
   ${MESSAGE_FIELDS}

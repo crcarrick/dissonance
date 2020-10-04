@@ -4,6 +4,7 @@ export const typeDefs = gql`
   # Message Types
   type Message {
     id: ID!
+    cursor: ID!
     text: String!
     author: AuthUser!
     channel: Channel!
@@ -11,29 +12,9 @@ export const typeDefs = gql`
     updatedAt: Timestamp!
   }
 
-  type MessageFeedEdge {
-    cursor: ID!
-    node: Message
-  }
-
-  type MessageFeedPageInfo {
-    startCursor: ID!
-    endCursor: ID!
-    hasNextPage: Boolean!
-    hasPrevPage: Boolean!
-  }
-
-  type MessageFeedPayload {
-    edges: [MessageFeedEdge]!
-    pageInfo: MessageFeedPageInfo!
-  }
-
   # Message Inputs
   input GetMessagesInput {
-    channelId: ID!
-  }
-
-  input MessageFeedInput {
+    after: ID
     before: ID
     first: Int!
     channelId: ID!
@@ -51,7 +32,6 @@ export const typeDefs = gql`
   # Message Queries
   extend type Query {
     messages(input: GetMessagesInput!): [Message]! @authenticated
-    messageFeed(input: MessageFeedInput!): MessageFeedPayload! @authenticated
   }
 
   # Message Mutations
@@ -61,6 +41,6 @@ export const typeDefs = gql`
 
   # Message Subscriptions
   extend type Subscription {
-    messageAdded(input: MessageAddedInput!): MessageFeedEdge!
+    messageAdded(input: MessageAddedInput!): Message!
   }
 `;

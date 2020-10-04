@@ -4,13 +4,13 @@ import { MESSAGE_ADDED_EVENT } from './message.events';
 
 export const resolvers = {
   Query: {
-    messages: (_, { input: { channelId } }, { dataSources: { messages } }) =>
-      messages.getByChannel(channelId),
-    messageFeed: (
+    // messages: (_, { input: { channelId } }, { dataSources: { messages } }) =>
+    //   messages.getByChannel(channelId),
+    messages: (
       _,
-      { input: { before, first, channelId } },
+      { input: { after, before, first, channelId } },
       { dataSources: { messages } }
-    ) => messages.getMessageFeed({ before, first, channelId }),
+    ) => messages.getMessages({ after, before, first, channelId }),
   },
   Mutation: {
     createMessage: (

@@ -15,6 +15,20 @@ export const GET_MESSAGES = gql`
   ${MESSAGE_FIELDS}
 `;
 
+const wrappedFetchMore = ({ after, before, direction, input, fetchMore }) => {
+  let inpt = { ...input };
+
+  if (direction === 'up') {
+    inpt.before = before;
+  } else if (direction === 'down') {
+    inpt.after = after;
+  }
+
+  fetchMore({
+    variables: { input: inpt },
+  });
+};
+
 const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
   subscribeToMore({
     document: MESSAGE_ADDED,
@@ -38,17 +52,41 @@ const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
   });
 
 export const useGetMessages = ({ input }) => {
-  const { data, loading, error, subscribeToMore } = useQuery(GET_MESSAGES, {
-    variables: {
-      input,
-    },
-    fetchPolicy: 'cache-and-network',
-  });
+  const { data, loading, error, fetchMore, subscribeToMore } = useQuery(
+    GET_MESSAGES,
+    {
+      variables: {
+        input: {
+          ...input,
+          first: 50,
+        },
+      },
+      notifyOnNetworkStatusChange: true,
+    }
+  );
+
+  // This is a little counterintuitive because we're reversing the list later
+  const after = data?.messages[0].cursor;
+  const before = data?.messages[data.messages.length - 1].cursor;
 
   return {
     data,
     loading,
     error,
+    fetchMore: useCallback(
+      ({ direction }) =>
+        wrappedFetchMore({
+          input: {
+            channelId: input.channelId,
+            first: 50,
+          },
+          after,
+          before,
+          direction,
+          fetchMore,
+        }),
+      [after, before, input.channelId, fetchMore]
+    ),
     subscribeToMore: useCallback(
       () =>
         wrappedSubscribeToMore({

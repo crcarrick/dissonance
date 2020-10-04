@@ -16,7 +16,6 @@ export class MessageDataSource extends SQLDataSource {
     this.byChannelLoader = new DataLoader((ids) =>
       this.db(this.table)
         .whereIn('channelId', ids)
-        .orderBy('createdAt', 'asc')
         .select()
         .then(mapToMany(ids, (message) => message.channelId))
     );
@@ -38,7 +37,7 @@ export class MessageDataSource extends SQLDataSource {
     }
   }
 
-  async getMessageFeed({ before, first, channelId }) {
+  async getMessages({ after, before, first, channelId }) {
     try {
       const authorized = this.userBelongsToChannel(channelId);
 
@@ -48,34 +47,22 @@ export class MessageDataSource extends SQLDataSource {
 
       let query = this.db(this.table).where('channelId', channelId);
 
+      // TODO: Figure out how to use UUID in the cursor to avoid createdAt collisions
       if (before) {
-        query = query.whereRaw(
-          '(created_at, id) < (?, ?)',
-          this.decodeCursor(before)
-        );
+        query = query.where('createdAt', '<', this.decodeCursor(before));
+      } else if (after) {
+        query = query.where('createdAt', '>', this.decodeCursor(after));
       }
 
       const messages = await query
-        .orderBy('createdAt', 'desc')
+        .orderBy('createdAt', after ? 'asc' : 'desc')
         .limit(first)
         .select();
 
-      const start = messages[0];
-      const end = messages[messages.length - 1];
-
-      return {
-        edges: messages.map((message) => ({
-          cursor: this.createCursor(message),
-          node: message,
-        })),
-        pageInfo: {
-          startCursor: this.createCursor(start),
-          endCursor: this.createCursor(end),
-          // TODO
-          hasNextPage: false,
-          hasPrevPage: false,
-        },
-      };
+      return messages.map((message) => ({
+        ...message,
+        cursor: this.createCursor(message),
+      }));
     } catch (error) {
       this.didEncounterError(error);
     }
@@ -91,15 +78,17 @@ export class MessageDataSource extends SQLDataSource {
         throw new ForbiddenError();
       }
 
-      const [message] = await this.db(this.table)
+      const [msg] = await this.db(this.table)
         .insert({ authorId: user.id, channelId, text })
         .returning(this.columns);
 
+      const message = {
+        ...msg,
+        cursor: this.createCursor(msg),
+      };
+
       pubsub.publish(MESSAGE_ADDED_EVENT, {
-        messageAdded: {
-          cursor: this.createCursor(message),
-          node: message,
-        },
+        messageAdded: message,
       });
 
       return message;
@@ -127,7 +116,7 @@ export class MessageDataSource extends SQLDataSource {
 
   createCursor(message) {
     if (message) {
-      const cursor = `${message.createdAt.getTime()},${message.id}`;
+      const cursor = `${message.createdAt.getTime()}`;
       const buffer = Buffer.from(cursor);
 
       return buffer.toString('base64');
@@ -138,8 +127,26 @@ export class MessageDataSource extends SQLDataSource {
 
   decodeCursor(cursor) {
     const buffer = Buffer.from(cursor, 'base64');
-    const [createdAt, id] = buffer.toString('ascii').split(',');
+    const createdAt = buffer.toString('ascii');
 
-    return [new Date(parseInt(createdAt, 10)), id];
+    return new Date(parseInt(createdAt, 10));
   }
+
+  // createCursor(message) {
+  //   if (message) {
+  //     const cursor = `${message.createdAt.getTime()},${message.id}`;
+  //     const buffer = Buffer.from(cursor);
+
+  //     return buffer.toString('base64');
+  //   }
+
+  //   return '';
+  // }
+
+  // decodeCursor(cursor) {
+  //   const buffer = Buffer.from(cursor, 'base64');
+  //   const [createdAt, id] = buffer.toString('ascii').split(',');
+
+  //   return [new Date(parseInt(createdAt, 10)), id];
+  // }
 }

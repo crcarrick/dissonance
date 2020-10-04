@@ -25,25 +25,25 @@ export const GET_MESSAGE_FEED = gql`
 const wrappedFetchMore = ({ input, fetchMore }) =>
   fetchMore({
     variables: { input },
-    updateQuery: ({ messageFeed }, { fetchMoreResult }) => {
-      if (!fetchMoreResult) {
-        return messageFeed;
-      }
+    // updateQuery: ({ messageFeed }, { fetchMoreResult }) => {
+    //   if (!fetchMoreResult) {
+    //     return messageFeed;
+    //   }
 
-      console.log(messageFeed);
-
-      return {
-        messageFeed: {
-          ...messageFeed,
-          edges: [...fetchMoreResult.messageFeed.edges, ...messageFeed.edges],
-
-          pageInfo: {
-            ...messageFeed.pageInfo,
-            ...fetchMoreResult.messageFeed.pageInfo,
-          },
-        },
-      };
-    },
+    //   return {
+    //     messageFeed: {
+    //       ...messageFeed,
+    //       edges: uniqBy(
+    //         [...messageFeed.edges, ...fetchMoreResult.messageFeed.edges],
+    //         'node.id'
+    //       ),
+    //       pageInfo: {
+    //         ...messageFeed.pageInfo,
+    //         ...fetchMoreResult.messageFeed.pageInfo,
+    //       },
+    //     },
+    //   };
+    // },
   });
 
 const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
@@ -57,15 +57,10 @@ const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
 
       const message = subscriptionData.data.messageAdded;
 
-      // Don't add messages twice
-      if (find(messageFeed, { id: message.id })) {
-        return messageFeed;
-      }
-
       return {
         messageFeed: {
           ...messageFeed,
-          edges: [...messageFeed.edges, message],
+          edges: [message, ...messageFeed.edges],
         },
       };
     },
@@ -78,10 +73,10 @@ export const useGetMessageFeed = ({ input }) => {
       variables: {
         input: {
           ...input,
-          first: 20,
+          first: 50,
         },
       },
-      fetchPolicy: 'cache-and-network',
+      // fetchPolicy: 'cache-and-network',
       notifyOnNetworkStatusChange: true,
     }
   );
