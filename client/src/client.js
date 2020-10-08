@@ -102,6 +102,9 @@ export const client = new ApolloClient({
             ) => {
               let next;
 
+              // TODO:
+              // It is dumb to discard and then refetch records I've already gotten
+              // This needs to be done in the view rather than the data layer
               if (before) {
                 next = uniqBy([...existing, ...incoming], '__ref').slice();
 

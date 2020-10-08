@@ -41,8 +41,6 @@ export const Channel = () => {
     // loading,
     channel,
     messages,
-    endCursor,
-    startCursor,
     fetchMore,
     handleChange,
     handleSubmit,
@@ -69,7 +67,7 @@ export const Channel = () => {
           }
         }}
         onUpdate={({ scrollTop }) => {
-          // console.log(speedInstrument.measure(scrollTop));
+          console.log(speedInstrument.measure(scrollTop));
 
           if (scrollTop < 1 && scrollbarRef.current) {
             scrollbarRef.current.scrollTop(scrollTop + 1);
@@ -87,7 +85,14 @@ export const Channel = () => {
               )}
               <ChannelMessageAvatar
                 src={author.avatarUrl}
-                style={{ background: i === 25 ? 'red' : 'white' }}
+                style={{
+                  background:
+                    i === 25
+                      ? 'red'
+                      : messages.length === 200 && i === 175
+                      ? 'green'
+                      : 'white',
+                }}
               />
               <ChannelMessageContent style={{ marginLeft: 16 }}>
                 <ChannelMessageUsername>
