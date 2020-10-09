@@ -80,7 +80,7 @@ export const Channel = () => {
               {i === 25 && (
                 <Waypoint onEnter={() => fetchMore({ direction: 'up' })} />
               )}
-              {messages.length === 200 && i === 176 && (
+              {messages.length === 200 && i === 175 && (
                 <Waypoint onEnter={() => fetchMore({ direction: 'down' })} />
               )}
               <ChannelMessageAvatar
