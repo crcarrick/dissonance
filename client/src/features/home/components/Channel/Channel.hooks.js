@@ -6,7 +6,7 @@ import { client } from '@dissonance/client';
 import { useCreateMessage, useGetMessages } from '@dissonance/data';
 import { useRouter } from '@dissonance/hooks';
 
-export const useChannel = (scrollbarRef) => {
+export const useChannel = () => {
   const { match } = useRouter();
   const [message, setMessage] = useState('');
 

@@ -30,7 +30,11 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "react-transition-group": "^4.4.1",
+    "react-virtualized": "^9.22.2",
+    "react-virtualized-auto-sizer": "^1.0.2",
     "react-waypoint": "^9.0.3",
+    "react-window": "^1.8.6",
+    "react-window-infinite-loader": "^1.0.5",
     "subscriptions-transport-ws": "^0.9.18",
     "yup": "^0.29.3"
   },

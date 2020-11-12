@@ -24,7 +24,7 @@ const wrappedFetchMore = ({ after, before, direction, input, fetchMore }) => {
     inpt.after = after;
   }
 
-  fetchMore({
+  return fetchMore({
     variables: { input: inpt },
   });
 };

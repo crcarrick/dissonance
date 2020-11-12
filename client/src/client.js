@@ -39,9 +39,7 @@ const authLink = setContext(({ operationName }, { headers }) => {
   return {
     headers: {
       ...headers,
-      Authorization: token
-        ? `Bearer ${localStorage.getItem(process.env.REACT_APP_AUTH_TOKEN)}`
-        : '',
+      Authorization: token ? `Bearer ${token}` : '',
     },
   };
 });
@@ -101,27 +99,13 @@ export const client = new ApolloClient({
               }
             ) => {
               let next;
-
-              // TODO:
-              // It is dumb to discard and then refetch records I've already gotten
-              // This needs to be done in the view rather than the data layer
               if (before) {
                 next = uniqBy([...existing, ...incoming], '__ref').slice();
-
-                if (next.length > 200) {
-                  next = next.slice(next.length - 200);
-                }
               } else if (after) {
                 next = uniqBy(
                   [...incoming.reverse(), ...existing],
                   '__ref'
                 ).slice();
-
-                console.log(next);
-
-                if (next.length > 200) {
-                  next = next.slice(0, 200);
-                }
               } else {
                 next = incoming;
               }
