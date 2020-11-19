@@ -1,4 +1,4 @@
-import { ForbiddenError } from 'apollo-server';
+import { ForbiddenError, UserInputError } from 'apollo-server';
 import DataLoader from 'dataloader';
 
 import { TABLE_NAMES } from '@dissonance/constants';
@@ -6,6 +6,7 @@ import { SQLDataSource } from '@dissonance/domains/sql.datasource';
 import { mapToMany } from '@dissonance/utils';
 
 import { MESSAGE_ADDED_EVENT } from './message.events';
+import { reverse } from 'lodash';
 
 export class MessageDataSource extends SQLDataSource {
   columns = ['id', 'text', 'authorId', 'channelId', 'createdAt', 'updatedAt'];
@@ -37,7 +38,7 @@ export class MessageDataSource extends SQLDataSource {
     }
   }
 
-  async getMessages({ after, before, first, channelId }) {
+  async getMessageFeed({ after, before, first, last, channelId }) {
     try {
       const authorized = this.userBelongsToChannel(channelId);
 
@@ -45,24 +46,39 @@ export class MessageDataSource extends SQLDataSource {
         throw new ForbiddenError();
       }
 
-      let query = this.db(this.table).where('channelId', channelId);
-
-      // TODO: Figure out how to use UUID in the cursor to avoid createdAt collisions
-      if (before) {
-        query = query.where('createdAt', '<', this.decodeCursor(before));
-      } else if (after) {
-        query = query.where('createdAt', '>', this.decodeCursor(after));
+      if (
+        (!first && !last) ||
+        (first && last) ||
+        (first && before) ||
+        (last && after)
+      ) {
+        throw new UserInputError();
       }
 
-      const messages = await query
-        .orderBy('createdAt', after ? 'asc' : 'desc')
-        .limit(first)
-        .select();
+      const messages = await this.getMessageFeedQuery({
+        after,
+        before,
+        first,
+        last,
+        channelId,
+      });
 
-      return messages.map((message) => ({
-        ...message,
-        cursor: this.createCursor(message),
-      }));
+      const edges = this.getEdges({ first, last, messages });
+
+      const pageInfo = this.getPageInfo({
+        after,
+        before,
+        first,
+        last,
+        edges,
+        messages,
+      });
+
+      return {
+        edges,
+        pageInfo,
+        totalCount: messages[0].totalCount,
+      };
     } catch (error) {
       this.didEncounterError(error);
     }
@@ -132,21 +148,73 @@ export class MessageDataSource extends SQLDataSource {
     return new Date(parseInt(createdAt, 10));
   }
 
-  // createCursor(message) {
-  //   if (message) {
-  //     const cursor = `${message.createdAt.getTime()},${message.id}`;
-  //     const buffer = Buffer.from(cursor);
+  getEdges({ first, last, messages }) {
+    const length =
+      messages.length === (first || last) + 1
+        ? messages.length - 1
+        : messages.length;
 
-  //     return buffer.toString('base64');
-  //   }
+    const edges = messages.slice(0, length).map((message) => ({
+      node: message,
+      cursor: this.createCursor(message),
+    }));
 
-  //   return '';
-  // }
+    return last ? edges.reverse() : edges;
+  }
 
-  // decodeCursor(cursor) {
-  //   const buffer = Buffer.from(cursor, 'base64');
-  //   const [createdAt, id] = buffer.toString('ascii').split(',');
+  getMessageFeedQuery({ after, before, first, last, channelId }) {
+    let query = this.db(this.table).where('channelId', channelId);
+    let selectArgs = [
+      ...this.columns,
+      this.db(this.table).count('id').as('totalCount'),
+    ];
 
-  //   return [new Date(parseInt(createdAt, 10)), id];
-  // }
+    if (after || before) {
+      const comparator = after ? '>' : '<';
+      const reverseComparator = after ? '<' : '>';
+      const cursor = this.decodeCursor(after || before);
+
+      query = query.where('createdAt', comparator, cursor);
+      selectArgs = [
+        ...selectArgs,
+        this.db(this.table)
+          .count('id')
+          .where('createdAt', reverseComparator, cursor)
+          .as('lookAhead'),
+      ];
+    }
+
+    return query
+      .orderBy('createdAt', first ? 'asc' : 'desc')
+      .limit((first || last) + 1)
+      .select(...selectArgs);
+  }
+
+  getPageInfo({ after, before, first, last, edges, messages }) {
+    const hasMoreRecords = Number(messages[0].lookAhead) > 0;
+
+    let hasPreviousPage;
+    let hasNextPage;
+
+    if (first) {
+      hasPreviousPage = hasPreviousPage || false;
+      hasNextPage = messages.length === first + 1;
+    } else if (last) {
+      hasPreviousPage = messages.length === last + 1;
+      hasNextPage = hasNextPage || false;
+    }
+
+    if (after) {
+      hasPreviousPage = hasMoreRecords;
+    } else if (before) {
+      hasNextPage = hasMoreRecords;
+    }
+
+    return {
+      hasPreviousPage,
+      hasNextPage,
+      startCursor: edges[0].cursor,
+      endCursor: edges[edges.length - 1].cursor,
+    };
+  }
 }
