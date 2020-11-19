@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch } from 'react-router-dom';
+
+import { AuthContext } from '@dissonance/contexts';
 
 import { HomeContainer } from './Home.style';
 
@@ -9,6 +11,10 @@ import { ChannelList } from './components/ChannelList';
 import { ServerList } from './components/ServerList';
 
 export const Home = () => {
+  const { user } = useContext(AuthContext);
+  const [server] = user.servers;
+  const [channel] = server.channels;
+
   return (
     <HomeContainer>
       <Switch>
@@ -21,6 +27,12 @@ export const Home = () => {
           <ChannelList />
           <Channel />
         </Route>
+        <Route
+          path="*"
+          render={() => (
+            <Redirect to={`/channels/${server.id}/${channel.id}`} />
+          )}
+        />
       </Switch>
     </HomeContainer>
   );

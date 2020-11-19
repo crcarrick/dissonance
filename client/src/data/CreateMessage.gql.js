@@ -8,7 +8,7 @@ import { useRouter } from '@dissonance/hooks';
 import { GET_MESSAGES } from './GetMessages.gql';
 import { MESSAGE_FIELDS } from './MessageFields.gql';
 
-import { AuthContext } from '../auth.context';
+import { AuthContext } from '../contexts/auth.context';
 
 export const CREATE_MESSAGE = gql`
   mutation CreateMessage($input: CreateMessageInput!) {

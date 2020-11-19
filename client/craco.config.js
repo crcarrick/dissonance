@@ -29,6 +29,7 @@ module.exports = {
       '@dissonance/assets': path.resolve(__dirname, 'src/assets/'),
       '@dissonance/client': path.resolve(__dirname, 'src/client.js'),
       '@dissonance/components': path.resolve(__dirname, 'src/components/'),
+      '@dissonance/contexts': path.resolve(__dirname, 'src/contexts/'),
       '@dissonance/data': path.resolve(__dirname, 'src/data/'),
       '@dissonance/hooks': path.resolve(__dirname, 'src/hooks/'),
     },

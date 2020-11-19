@@ -1,92 +1,71 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
-import { AutoSizer, List } from 'react-virtualized';
+import { Virtuoso } from 'react-virtuoso';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { MessageSharp } from '@material-ui/icons';
 
-const THRESHOLD = 15;
+// const DIRECTION = {
+//   Up: 'up',
+//   Down: 'down',
+// };
 
-const SCROLL_DIRECTIONS = {
-  UP: 'up',
-  DOWN: 'down',
+const CustomScrollbar = ({ style, reportScrollTop, scrollTo, children }) => {
+  const scrollbarRef = useRef();
+
+  scrollTo((scrollTop) => scrollbarRef.current.scrollTop(scrollTop));
+
+  return (
+    <Scrollbars
+      autoHide={true}
+      autoHideTimeout={500}
+      style={{ ...style }}
+      onUpdate={({ scrollTop }) => {
+        if (scrollTop < 1) {
+          scrollbarRef.current.scrollTop(scrollTop + 1);
+          reportScrollTop(scrollTop + 1);
+        } else {
+          scrollbarRef.current.scrollTop(scrollTop);
+          reportScrollTop(scrollTop);
+        }
+      }}
+      ref={scrollbarRef}
+    >
+      {children}
+    </Scrollbars>
+  );
 };
 
-export const InfiniteScroll = ({ fetchMore, items, renderRow }) => {
-  const listRef = useRef();
-  // const scrollbarRef = useRef();
+export const InfiniteScroll = ({
+  fetchMore,
+  items,
+  renderRow,
+  threshold = 25,
+}) => {
+  const virtuosoRef = useRef();
 
-  const [lastScrollTop, setLastScrollTop] = useState();
-  const [scrollDirection, setScrollDirection] = useState();
-
-  // const scrollbarRefSetter = (ref) => {
-  //   scrollbarRef.current = ref;
-
-  //   if (ref && !scrolledToBottom) {
-  //     ref.scrollToBottom();
-  //     setScrolledToBottom(true);
-  //   }
+  // const handleStartReached = () => {
+  //   fetchMore({ direction: DIRECTION.Up }).then((length) =>
+  //     virtuosoRef.current.adjustForPrependedItems(length)
+  //   );
   // };
 
-  // const handleScrollbarScroll = ({ target: { scrollTop, scrollLeft } }) => {
-  //   listRef.current.Grid.handleScrollEvent({ scrollTop, scrollLeft });
+  // const handleEndReached = () => {
+  //   fetchMore({ direction: DIRECTION.Down });
   // };
 
-  const handleListScroll = ({ scrollTop }) => {
-    if (lastScrollTop) {
-      if (scrollTop < lastScrollTop) {
-        setScrollDirection(SCROLL_DIRECTIONS.UP);
-      } else if (scrollTop > lastScrollTop) {
-        setScrollDirection(SCROLL_DIRECTIONS.DOWN);
-      }
+  const item = (index) => {
+    if (items[index]) {
+      return renderRow({ index });
     }
-
-    setLastScrollTop(scrollTop);
-  };
-
-  // const handleUpdate = ({ scrollTop }) => {
-  //   if (scrollTop < 1 && scrollbarRef.current) {
-  //     scrollbarRef.current.scrollTop(scrollTop + 1);
-  //   }
-  // };
-
-  const handleRowsRendered = ({ startIndex, stopIndex }) => {
-    // if (scrolledToBottom) {
-    if (startIndex <= THRESHOLD && scrollDirection === SCROLL_DIRECTIONS.UP) {
-      fetchMore({ direction: SCROLL_DIRECTIONS.UP });
-    } else if (
-      stopIndex >= items.length - THRESHOLD &&
-      scrollDirection === SCROLL_DIRECTIONS.DOWN
-    ) {
-      fetchMore({ direction: SCROLL_DIRECTIONS.DOWN });
-    }
-    // }
   };
 
   return (
-    <AutoSizer>
-      {({ height, width }) => (
-        // <Scrollbars
-        //   autoHide={true}
-        //   autoHideTimeout={500}
-        //   style={{ height, width }}
-        //   ref={scrollbarRefSetter}
-        //   onScroll={handleScrollbarScroll}
-        //   onUpdate={handleUpdate}
-        // >
-        <List
-          height={height}
-          width={width}
-          rowHeight={75}
-          rowRenderer={renderRow}
-          rowCount={items.length}
-          onRowsRendered={handleRowsRendered}
-          onScroll={handleListScroll}
-          scrollToIndex={items.length - 1}
-          // style={{ overflowX: 'visible', overflowY: 'visible' }}
-          ref={listRef}
-        />
-        // </Scrollbars>
-      )}
-    </AutoSizer>
+    <Virtuoso
+      style={{ width: '100%', height: '100%' }}
+      overscan={1000}
+      totalCount={items.length}
+      item={item}
+      ref={virtuosoRef}
+      ScrollContainer={CustomScrollbar}
+    />
   );
 };

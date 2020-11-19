@@ -9,7 +9,6 @@ import {
 import { getMainDefinition } from '@apollo/client/utilities';
 import { setContext } from '@apollo/client/link/context';
 import { WebSocketLink } from '@apollo/client/link/ws';
-
 import { uniqBy } from 'lodash';
 
 const httpLink = createHttpLink({
@@ -30,7 +29,7 @@ const wsLink = new WebSocketLink({
 });
 
 const authLink = setContext(({ operationName }, { headers }) => {
-  if (operationName === 'LoginUser' || operationName === 'SignupUser') {
+  if (operationName === 'Login' || operationName === 'Signup') {
     return { headers };
   }
 
@@ -75,22 +74,27 @@ const link = split(
   authLink.concat(artificialLatencyLink).concat(httpLink)
 );
 
+const defaultFeed = {
+  edges: [],
+  pageInfo: {},
+  totalCount: 0,
+};
+
 export const client = new ApolloClient({
   link,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
         fields: {
-          messages: {
-            read: (messages, cache) => {
-              if (!messages) {
-                return;
-              }
-
-              return messages.filter((msg) => cache.canRead(msg));
+          messageFeed: {
+            read: (feed = defaultFeed, { canRead }) => {
+              return {
+                ...feed,
+                edges: feed.edges.filter((edge) => canRead(edge)),
+              };
             },
             merge: (
-              existing = [],
+              existing = defaultFeed,
               incoming,
               {
                 args: {
@@ -98,16 +102,26 @@ export const client = new ApolloClient({
                 },
               }
             ) => {
-              let next;
-              if (before) {
-                next = uniqBy([...existing, ...incoming], '__ref').slice();
-              } else if (after) {
-                next = uniqBy(
-                  [...incoming.reverse(), ...existing],
-                  '__ref'
-                ).slice();
-              } else {
-                next = incoming;
+              let next = incoming;
+
+              if (after) {
+                next = {
+                  ...existing,
+                  ...incoming,
+                  edges: uniqBy(
+                    [...existing.edges, ...incoming.edges],
+                    (edge) => edge.node.__ref
+                  ),
+                };
+              } else if (before) {
+                next = {
+                  ...existing,
+                  ...incoming,
+                  edges: uniqBy(
+                    [...incoming.edges, ...existing.edges],
+                    (edge) => edge.node.__ref
+                  ),
+                };
               }
 
               return next;

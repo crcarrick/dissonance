@@ -5,6 +5,7 @@
       "@dissonance/assets": ["src/assets/"],
       "@dissonance/client": ["src/client.js"],
       "@dissonance/components": ["src/components/"],
+      "@dissonance/contexts": ["src/contexts/"],
       "@dissonance/data": ["src/data/"],
       "@dissonance/hooks": ["src/hooks/"]
     }

@@ -1,5 +1,5 @@
 import { client } from '@dissonance/client';
-import { useLazyGetMessages } from '@dissonance/data';
+// import { useLazyGetMessages } from '@dissonance/data';
 import { useRouter } from '@dissonance/hooks';
 
 import { READ_SERVER } from './ChannelList.gql';

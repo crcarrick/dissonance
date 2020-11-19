@@ -1,4 +1,6 @@
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { useCallback } from 'react';
+
+import { gql, useApolloClient, useQuery } from '@apollo/client';
 
 export const GET_ME = gql`
   query GetMe {
@@ -20,22 +22,18 @@ export const GET_ME = gql`
   }
 `;
 
-export const useGetMe = ({ input }) => {
-  const { data, loading, error } = useQuery(GET_ME, {
-    variables: {
-      input,
-    },
-  });
+export const useGetMe = () => {
+  const response = useQuery(GET_ME);
 
-  return { data, loading, error };
+  return response;
 };
 
-export const useLazyGetMe = ({ input }) => {
-  const [getMe] = useLazyQuery(GET_ME, {
-    variables: {
-      input,
-    },
-  });
+export const useLazyGetMe = () => {
+  // FIXME:
+  //
+  // Need to use this hack so that we can await the result of the query
+  // Fix if / when Apollo adds this functionality to useLazyQuery
+  const client = useApolloClient();
 
-  return getMe;
+  return [useCallback(() => client.query({ query: GET_ME }), [client])];
 };

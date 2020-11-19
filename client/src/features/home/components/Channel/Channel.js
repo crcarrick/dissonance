@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 
 import { formatRelative } from 'date-fns';
 import { upperFirst } from 'lodash';
-import Skeleton from '@material-ui/lab/Skeleton';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { Waypoint } from 'react-waypoint';
 
@@ -22,32 +21,19 @@ import {
   ChannelTopBar,
 } from './Channel.style';
 
-class ScrollSpeedInstrument {
-  lastPosition = null;
-
-  measure(currPosition) {
-    const delta = currPosition - this.lastPosition;
-
-    this.lastPosition = currPosition;
-
-    return delta;
-  }
-}
-
 export const Channel = () => {
   const scrollbarRef = useRef();
 
   const {
-    // loading,
+    loading,
+    edges,
+    pageInfo,
     channel,
-    messages,
     fetchMore,
     handleChange,
     handleSubmit,
     message,
   } = useChannel(scrollbarRef);
-
-  const speedInstrument = new ScrollSpeedInstrument();
 
   return (
     <ChannelContainer>
@@ -62,34 +48,44 @@ export const Channel = () => {
         style={{ flex: 1 }}
         ref={(ref) => {
           scrollbarRef.current = ref;
-          if (ref && messages?.length === 50) {
+          if (ref && edges?.length === 50) {
             ref.scrollToBottom();
           }
         }}
         onUpdate={({ scrollTop }) => {
-          console.log(speedInstrument.measure(scrollTop));
-
           if (scrollTop < 1 && scrollbarRef.current) {
             scrollbarRef.current.scrollTop(scrollTop + 1);
           }
         }}
       >
         <ChannelMessages>
-          {messages.map(({ id, author, text, createdAt }, i) => (
+          {edges.map(({ node: { id, author, text, createdAt } }, i) => (
             <ChannelMessage key={id}>
               {i === 25 && (
-                <Waypoint onEnter={() => fetchMore({ direction: 'up' })} />
+                <Waypoint
+                  onEnter={() => {
+                    if (!loading && pageInfo.hasPreviousPage) {
+                      fetchMore({ direction: 'up' });
+                    }
+                  }}
+                />
               )}
-              {messages.length === 200 && i === 175 && (
-                <Waypoint onEnter={() => fetchMore({ direction: 'down' })} />
-              )}
+              {/* {edges.length === 200 && i === 175 && (
+                <Waypoint
+                  onEnter={() => {
+                    if (!loading && pageInfo.hasNextPage) {
+                      fetchMore({ direction: 'down' });
+                    }
+                  }}
+                />
+              )} */}
               <ChannelMessageAvatar
                 src={author.avatarUrl}
                 style={{
                   background:
                     i === 25
                       ? 'red'
-                      : messages.length === 200 && i === 175
+                      : edges.length === 200 && i === 175
                       ? 'green'
                       : 'white',
                 }}

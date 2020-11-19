@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { find, uniqBy } from 'lodash';
 
 import { MESSAGE_ADDED } from './MessageAdded.gql';
 import { MESSAGE_FIELDS } from './MessageFields.gql';
@@ -15,36 +14,38 @@ export const GET_MESSAGE_FEED = gql`
         }
       }
       pageInfo {
+        hasPreviousPage
+        hasNextPage
+        startCursor
         endCursor
       }
+      totalCount
     }
   }
   ${MESSAGE_FIELDS}
 `;
 
-const wrappedFetchMore = ({ input, fetchMore }) =>
-  fetchMore({
-    variables: { input },
-    // updateQuery: ({ messageFeed }, { fetchMoreResult }) => {
-    //   if (!fetchMoreResult) {
-    //     return messageFeed;
-    //   }
+const wrappedFetchMore = ({
+  startCursor,
+  endCursor,
+  direction,
+  input,
+  fetchMore,
+}) => {
+  let inpt = { ...input };
 
-    //   return {
-    //     messageFeed: {
-    //       ...messageFeed,
-    //       edges: uniqBy(
-    //         [...messageFeed.edges, ...fetchMoreResult.messageFeed.edges],
-    //         'node.id'
-    //       ),
-    //       pageInfo: {
-    //         ...messageFeed.pageInfo,
-    //         ...fetchMoreResult.messageFeed.pageInfo,
-    //       },
-    //     },
-    //   };
-    // },
+  if (direction === 'up') {
+    inpt.before = startCursor;
+    inpt.last = 20;
+  } else if (direction === 'down') {
+    inpt.after = endCursor;
+    inpt.first = 20;
+  }
+
+  return fetchMore({
+    variables: { input: inpt },
   });
+};
 
 const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
   subscribeToMore({
@@ -67,37 +68,40 @@ const wrappedSubscribeToMore = ({ channelId, subscribeToMore }) =>
   });
 
 export const useGetMessageFeed = ({ input }) => {
-  const { data, loading, error, fetchMore, subscribeToMore } = useQuery(
-    GET_MESSAGE_FEED,
-    {
-      variables: {
-        input: {
-          ...input,
-          first: 50,
-        },
+  const {
+    data = { messageFeed: { edges: [], pageInfo: {}, totalCount: 0 } },
+    loading,
+    error,
+    fetchMore,
+    subscribeToMore,
+  } = useQuery(GET_MESSAGE_FEED, {
+    variables: {
+      input: {
+        ...input,
+        last: 50,
       },
-      // fetchPolicy: 'cache-and-network',
-      notifyOnNetworkStatusChange: true,
-    }
-  );
+    },
+    notifyOnNetworkStatusChange: true,
+  });
 
-  const endCursor = data?.messageFeed?.pageInfo.endCursor;
+  const { startCursor, endCursor } = data.messageFeed.pageInfo;
 
   return {
     data,
     loading,
     error,
     fetchMore: useCallback(
-      () =>
+      ({ direction }) =>
         wrappedFetchMore({
           input: {
             channelId: input.channelId,
-            first: 20,
-            before: endCursor,
           },
+          startCursor,
+          endCursor,
+          direction,
           fetchMore,
         }),
-      [endCursor, input.channelId, fetchMore]
+      [startCursor, endCursor, input.channelId, fetchMore]
     ),
     subscribeToMore: useCallback(
       () =>

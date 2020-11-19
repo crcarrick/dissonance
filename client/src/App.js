@@ -1,21 +1,19 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { useQuery } from '@apollo/client';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { Loader, ProtectedRoute } from '@dissonance/components';
-import { GET_ME } from '@dissonance/data';
+import { AuthContextProvider } from '@dissonance/contexts';
+import { useGetMe } from '@dissonance/data';
 
 import { Auth } from './features/auth';
 import { Home } from './features/home';
 
-import { AuthContextProvider } from './auth.context';
-
 export const App = () => {
-  const { data, loading } = useQuery(GET_ME);
+  const { data, loading } = useGetMe();
 
-  const canActivate = () => Boolean(data?.me);
+  const canActivate = useCallback(() => Boolean(data?.me), [data]);
 
   return (
     <>

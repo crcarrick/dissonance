@@ -48,6 +48,12 @@ export const ChannelMessageContent = styled.div`
 
 export const ChannelMessageUsername = styled.div``;
 
+export const ChannelMessageTimestamp = styled.span`
+  color: #72767d;
+  font-size: 12px;
+  margin-left: 10px;
+`;
+
 export const ChannelMessageText = styled.div``;
 
 export const ChannelInputContainer = styled.form`

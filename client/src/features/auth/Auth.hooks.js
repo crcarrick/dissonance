@@ -1,20 +1,20 @@
 import { useState } from 'react';
 
-import { useLazyQuery, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { GET_ME } from '@dissonance/data';
+import { useLazyGetMe } from '@dissonance/data';
 import { useRouter } from '@dissonance/hooks';
 
 export const useAuth = ({ initialValues, mutation }) => {
-  const { history } = useRouter();
+  const { push } = useRouter();
 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [mutate] = useMutation(mutation);
-  const [getMe] = useLazyQuery(GET_ME);
+  const [getMe] = useLazyGetMe();
 
   const handleSubmit = async (values) => {
     try {
@@ -29,9 +29,9 @@ export const useAuth = ({ initialValues, mutation }) => {
 
       await getMe();
 
-      setLoading(false);
+      push('/');
 
-      history.push('/');
+      setLoading(false);
     } catch (error) {
       setError(error);
       setLoading(false);

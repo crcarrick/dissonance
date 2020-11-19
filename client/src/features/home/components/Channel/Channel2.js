@@ -13,6 +13,7 @@ import {
   ChannelMessageContent,
   ChannelMessages,
   ChannelMessageText,
+  ChannelMessageTimestamp,
   ChannelMessageUsername,
   ChannelName,
   ChannelPoundSign,
@@ -40,31 +41,32 @@ export const Channel = () => {
       </ChannelTopBar>
       <ChannelMessages>
         <InfiniteScroll
-          fetchMore={loading ? () => {} : fetchMore}
+          fetchMore={
+            loading
+              ? () => Promise.resolve()
+              : ({ direction }) =>
+                  fetchMore({ direction }).then(
+                    ({ data }) => data.messages.length
+                  )
+          }
           items={messages}
-          renderRow={({ key, index, style }) => {
+          renderRow={({ index }) => {
             const { author, text, createdAt } = messages[index];
 
             return (
-              <ChannelMessage key={key} style={{ ...style }}>
+              <ChannelMessage>
                 <ChannelMessageAvatar src={author.avatarUrl} />
                 <ChannelMessageContent style={{ marginLeft: 16 }}>
                   <ChannelMessageUsername>
                     {author.username}
-                    <span
-                      style={{
-                        color: '#72767d',
-                        fontSize: 12,
-                        marginLeft: 10,
-                      }}
-                    >
+                    <ChannelMessageTimestamp>
                       {upperFirst(
                         formatRelative(new Date(createdAt), new Date()).replace(
                           'last ',
                           ''
                         )
                       )}
-                    </span>
+                    </ChannelMessageTimestamp>
                   </ChannelMessageUsername>
                   <ChannelMessageText>{text}</ChannelMessageText>
                 </ChannelMessageContent>
